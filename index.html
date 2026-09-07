@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Au Fil du Temps - Restaurant, Boîte de Nuit & Casino</title>
+    <title>Au Fil du Temps - Luxe, Club & Casino</title>
 
     <!-- INITIALISATION FIREBASE -->
     <script type="module">
@@ -24,48 +24,58 @@
 
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-gold: #fbbf24;
+            --bg-deep: #090d16;
+            --bg-surface: #131b2e;
+            --bg-card: #1b263b;
+            --accent-gold: #f59e0b;
+            --accent-gold-glow: rgba(245, 158, 11, 0.4);
             --accent-green: #10b981;
             --accent-red: #ef4444;
-            --accent-purple: #8b5cf6;
+            --accent-purple: #a855f7;
+            --accent-purple-glow: rgba(168, 85, 247, 0.4);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
+            --border-color: #334155;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-deep);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(168, 85, 247, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 40%);
         }
 
         header {
-            background: rgba(30, 41, 59, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
+            background: rgba(19, 27, 46, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid var(--border-color);
             position: sticky;
             top: 0;
             z-index: 100;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--accent-gold);
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -79,11 +89,12 @@
 
         .badge-jetons {
             background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #fff;
+            color: #090d16;
             padding: 0.4rem 1rem;
-            border-radius: 20px;
-            font-weight: bold;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            border-radius: 30px;
+            font-weight: 800;
+            box-shadow: 0 0 15px var(--accent-gold-glow);
+            font-size: 0.95rem;
         }
 
         main {
@@ -91,35 +102,45 @@
             max-width: 1200px;
             width: 100%;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2.5rem 1.5rem;
         }
 
-        /* VUE AUTHENTIFICATION */
+        /* AUTHENTIFICATION */
         #auth-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 70vh;
+            min-height: 70vh;
         }
 
         .auth-card {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            background: var(--bg-surface);
+            padding: 3rem 2.5rem;
+            border-radius: 1.25rem;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
-            border: 1px solid #334155;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--accent-gold), var(--accent-purple));
         }
 
         .auth-card h2 {
             margin-bottom: 1.5rem;
-            color: var(--accent-gold);
+            color: var(--text-main);
+            font-size: 1.6rem;
         }
 
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.25rem;
             text-align: left;
         }
 
@@ -127,164 +148,200 @@
             display: block;
             margin-bottom: 0.5rem;
             color: var(--text-muted);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .form-control {
             width: 100%;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            border: 1px solid #475569;
-            background: #0f172a;
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-deep);
             color: white;
             font-size: 1rem;
+            transition: all 0.2s ease;
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--accent-gold);
+            box-shadow: 0 0 10px var(--accent-gold-glow);
         }
 
         .btn {
-            background: var(--accent-gold);
-            color: #0f172a;
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: #090d16;
             border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: bold;
+            padding: 0.85rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 800;
             cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
+            transition: all 0.2s ease;
             width: 100%;
             font-size: 1rem;
+            box-shadow: 0 4px 15px var(--accent-gold-glow);
         }
 
         .btn:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            filter: brightness(1.1);
         }
 
         .btn-secondary {
             background: transparent;
             color: var(--text-muted);
-            border: 1px solid #475569;
+            border: 1px solid var(--border-color);
+            box-shadow: none;
             margin-top: 0.5rem;
         }
         .btn-secondary:hover {
-            background: #334155;
+            background: var(--bg-card);
             color: white;
+            border-color: var(--text-muted);
+            transform: none;
         }
 
-        /* NAVIGATION PRINCIPALE */
+        /* NAVIGATION PAR ONGLETS */
         .game-nav {
             display: flex;
-            gap: 1rem;
+            gap: 0.75rem;
             margin-bottom: 2rem;
             overflow-x: auto;
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.75rem;
+            scrollbar-width: thin;
         }
 
         .tab-btn {
-            background: var(--card-bg);
-            border: 1px solid #334155;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
             color: var(--text-muted);
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
+            padding: 0.8rem 1.25rem;
+            border-radius: 0.75rem;
             cursor: pointer;
             font-weight: 600;
             white-space: nowrap;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .tab-btn.active, .tab-btn:hover {
-            background: var(--accent-gold);
-            color: #0f172a;
+            background: var(--bg-card);
+            color: var(--accent-gold);
             border-color: var(--accent-gold);
+            box-shadow: 0 0 15px var(--accent-gold-glow);
         }
 
         .game-panel {
             display: none;
-            background: var(--card-bg);
-            border-radius: 1rem;
-            padding: 2rem;
-            border: 1px solid #334155;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            background: var(--bg-surface);
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease-in-out;
         }
 
         .game-panel.active {
             display: block;
         }
 
-        /* GRILLES ET CARTES RESTO / CLUB / CASINO */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .game-panel h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        /* RESTO, CLUB & CONTENUS */
         .content-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
             margin-top: 1.5rem;
         }
 
         .info-card {
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
+            background: var(--bg-deep);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.75rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .info-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-gold);
         }
 
         .info-card h3 {
             color: var(--accent-gold);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.25rem;
         }
 
+        /* GRILLES DE JEU */
         .game-grid {
             display: grid;
-            grid-template-columns: 1fr 300px;
+            grid-template-columns: 1fr 340px;
             gap: 2rem;
+            margin-top: 1.5rem;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 850px) {
             .game-grid {
                 grid-template-columns: 1fr;
             }
         }
 
         .table-display {
-            background: #064e3b;
-            border: 4px solid #065f46;
-            border-radius: 1rem;
+            background: radial-gradient(circle, #065f46 0%, #022c22 100%);
+            border: 6px solid #047857;
+            border-radius: 1.25rem;
             padding: 2rem;
-            min-height: 300px;
+            min-height: 350px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             text-align: center;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+            position: relative;
         }
 
         .cards-container {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
             margin: 1rem 0;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .playing-card {
-            background: white;
+            background: #ffffff;
             color: #0f172a;
-            width: 60px;
-            height: 90px;
-            border-radius: 6px;
+            width: 70px;
+            height: 105px;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 5px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            animation: dealCard 0.3s ease-out;
+            padding: 8px;
+            font-weight: 800;
+            font-size: 1rem;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            animation: dealCard 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .playing-card.red {
@@ -292,8 +349,8 @@
         }
 
         @keyframes dealCard {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from { transform: translateY(-60px) scale(0.8); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
         }
 
         .slot-machine {
@@ -304,86 +361,100 @@
         }
 
         .slot-reel {
-            background: #0f172a;
-            border: 2px solid #475569;
-            font-size: 3rem;
-            width: 80px;
-            height: 100px;
+            background: var(--bg-deep);
+            border: 3px solid var(--border-color);
+            font-size: 3.5rem;
+            width: 90px;
+            height: 120px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0.5rem;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            border-radius: 0.75rem;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
         }
 
         .roulette-wheel {
-            width: 150px;
-            height: 150px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
             background: conic-gradient(#dc2626 0deg 180deg, #1e293b 180deg 360deg);
             margin: 1.5rem auto;
-            border: 4px solid var(--accent-gold);
+            border: 5px solid var(--accent-gold);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+            font-weight: 800;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            box-shadow: 0 0 25px var(--accent-gold-glow);
         }
 
         .controls-box {
-            background: #0f172a;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            border: 1px solid #334155;
+            background: var(--bg-deep);
+            padding: 1.75rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
+            justify-content: center;
         }
 
         .status-msg {
-            font-size: 1.1rem;
-            font-weight: bold;
-            min-height: 1.5rem;
-            margin-bottom: 1rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+            min-height: 2rem;
+            margin-bottom: 0.5rem;
             color: var(--accent-gold);
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
         }
 
-        /* CLASSEMENT & TABLES */
+        /* CLASSEMENT */
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
+            background: var(--bg-deep);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .leaderboard-table th, .leaderboard-table td {
-            padding: 0.75rem;
+            padding: 1rem 1.25rem;
             text-align: left;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .leaderboard-table th {
             color: var(--text-muted);
+            background: rgba(19, 27, 46, 0.5);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* TOAST NOTIFICATIONS */
+        /* TOASTS */
         #toast-container {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 25px;
+            right: 25px;
             z-index: 1000;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
         .toast {
-            background: #334155;
+            background: var(--bg-surface);
             color: white;
             padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
             border-left: 4px solid var(--accent-gold);
-            animation: slideIn 0.3s ease;
+            border: 1px solid var(--border-color);
+            font-weight: 600;
+            animation: slideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .toast.error { border-left-color: var(--accent-red); }
         .toast.success { border-left-color: var(--accent-green); }
@@ -399,9 +470,9 @@
     <header>
         <div class="logo">🌙 Au Fil du Temps</div>
         <div class="user-info" id="header-user-info" style="display: none;">
-            <span id="username-display" style="font-weight: 600;"></span>
+            <span id="username-display" style="font-weight: 700; color: var(--text-main);"></span>
             <div class="badge-jetons">💎 <span id="user-points">1000</span> jetons</div>
-            <button class="btn btn-secondary" style="width: auto; padding: 0.4rem 1rem; font-size: 0.9rem;" onclick="logout()">Déconnexion</button>
+            <button class="btn btn-secondary" style="width: auto; padding: 0.4rem 1rem; font-size: 0.85rem;" onclick="logout()">Déconnexion</button>
         </div>
     </header>
 
@@ -409,12 +480,13 @@
         <!-- AUTHENTIFICATION -->
         <div id="auth-container">
             <div class="auth-card">
-                <h2>Connexion / Inscription</h2>
+                <h2>Bienvenue au Complexe</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Entrez votre pseudo pour accéder au restaurant, au club et au casino.</p>
                 <div class="form-group">
                     <label for="auth-pseudo">Votre Pseudo</label>
-                    <input type="text" id="auth-pseudo" class="form-control" placeholder="Ex: ClientVIP">
+                    <input type="text" id="auth-pseudo" class="form-control" placeholder="Ex: JeanVIP">
                 </div>
-                <button class="btn" onclick="handleAuth()">Accéder à l'établissement</button>
+                <button class="btn" onclick="handleAuth()">Entrer dans l'établissement</button>
             </div>
         </div>
 
@@ -433,28 +505,28 @@
             <!-- RESTAURANT -->
             <div id="restaurant-panel" class="game-panel active">
                 <h2>Le Restaurant Gastronomique</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Découvrez notre carte de saison et réservez votre table.</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Dégustez nos créations culinaires d'exception préparées par notre chef.</p>
                 <div class="content-grid">
                     <div class="info-card">
                         <div>
                             <h3>Entrées Raffinées</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Foie gras maison, Velouté de cèpes truffé ou Saumon gravlax.</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Foie gras maison, velouté de cèpes truffé ou saumon gravlax.</p>
                         </div>
-                        <button class="btn" style="margin-top: 1rem;" onclick="showToast('Entrée commandée avec succès !', 'success')">Commander (150 jetons)</button>
+                        <button class="btn" style="margin-top: 1.5rem;" onclick="showToast('Entrée commandée avec succès ! Bon appétit.', 'success')">Commander (150 jetons)</button>
                     </div>
                     <div class="info-card">
                         <div>
                             <h3>Plats Signature</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Pavé de bœuf Rossini, Homard bleu rôti ou Risotto aux morilles.</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Pavé de bœuf Rossini, homard bleu rôti ou risotto aux morilles.</p>
                         </div>
-                        <button class="btn" style="margin-top: 1rem;" onclick="showToast('Plat commandé avec succès !', 'success')">Commander (300 jetons)</button>
+                        <button class="btn" style="margin-top: 1.5rem;" onclick="showToast('Plat signature commandé ! Excellent choix.', 'success')">Commander (300 jetons)</button>
                     </div>
                     <div class="info-card">
                         <div>
                             <h3>Desserts & Douceurs</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Soufflé grand marnier, Tarte tatin revisitée ou Chocolat grand cru.</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Soufflé grand marnier, tarte tatin revisitée ou chocolat grand cru.</p>
                         </div>
-                        <button class="btn" style="margin-top: 1rem;" onclick="showToast('Dessert commandé avec succès !', 'success')">Commander (100 jetons)</button>
+                        <button class="btn" style="margin-top: 1.5rem;" onclick="showToast('Dessert commandé avec succès !', 'success')">Commander (100 jetons)</button>
                     </div>
                 </div>
             </div>
@@ -462,21 +534,21 @@
             <!-- BOITE DE NUIT -->
             <div id="club-panel" class="game-panel">
                 <h2>La Boîte de Nuit - Club VIP</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Ambiance électrique, DJ sets exclusifs et piste de danse.</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Vivez une nuit inoubliable sur des sons électro exclusifs et un design futuriste.</p>
                 <div class="content-grid">
                     <div class="info-card" style="border-color: var(--accent-purple);">
                         <div>
                             <h3>Soirée Electro & House</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Ce samedi dès 23h00 avec DJ résident invités.</p>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Line-up prestigieux ce samedi dès 23h00 avec DJs internationaux.</p>
                         </div>
-                        <button class="btn" style="background: var(--accent-purple); color: white; margin-top: 1rem;" onclick="showToast('Entrée VIP réservée pour la soirée Electro !', 'success')">Réserver Entrée VIP</button>
+                        <button class="btn" style="background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; margin-top: 1.5rem; box-shadow: 0 4px 15px var(--accent-purple-glow);" onclick="showToast('Entrée VIP réservée pour la soirée Electro !', 'success')">Réserver Entrée VIP</button>
                     </div>
                     <div class="info-card" style="border-color: var(--accent-purple);">
                         <div>
-                            <h3>Accès Carré VIP</h3>
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Bénéficiez d'une table réservée et d'un service exclusif.</p>
+                            <h3>Carré VIP Privatif</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Profitez d'une table réservée au plus près de la piste avec service dédié.</p>
                         </div>
-                        <button class="btn" style="background: var(--accent-purple); color: white; margin-top: 1rem;" onclick="showToast('Table VIP réservée avec succès !', 'success')">Réserver une Table</button>
+                        <button class="btn" style="background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; margin-top: 1.5rem; box-shadow: 0 4px 15px var(--accent-purple-glow);" onclick="showToast('Table VIP réservée avec succès !', 'success')">Réserver une Table</button>
                     </div>
                 </div>
             </div>
@@ -484,14 +556,14 @@
             <!-- BLACKJACK -->
             <div id="blackjack-panel" class="game-panel">
                 <h2>Blackjack Classic</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Tentez de battre le croupier sans dépasser 21.</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Affrontez le croupier de l'établissement et visez le 21 parfait.</p>
                 <div class="game-grid">
                     <div class="table-display">
-                        <div id="bj-dealer-info">Croupier : ?</div>
+                        <div id="bj-dealer-info" style="font-weight: 700;">Croupier : ?</div>
                         <div id="bj-dealer-cards" class="cards-container"></div>
                         <div class="status-msg" id="bj-status">Placez votre mise pour commencer</div>
                         <div id="bj-player-cards" class="cards-container"></div>
-                        <div>Votre Main</div>
+                        <div style="font-weight: 700;">Votre Main</div>
                     </div>
                     <div class="controls-box">
                         <div class="form-group">
@@ -499,8 +571,8 @@
                             <input type="number" id="bj-bet" class="form-control" value="50" min="10">
                         </div>
                         <button class="btn" id="bj-start-btn" onclick="startBlackjack()">Distribuer</button>
-                        <div id="bj-actions" style="display: none; display: flex; flex-direction: column; gap: 0.5rem;">
-                            <button class="btn" style="background: var(--accent-green);" onclick="hitBlackjack()">Carte (Hit)</button>
+                        <div id="bj-actions" style="display: none; flex-direction: column; gap: 0.75rem;">
+                            <button class="btn" style="background: var(--accent-green); color: white;" onclick="hitBlackjack()">Carte (Hit)</button>
                             <button class="btn" style="background: var(--accent-red); color: white;" onclick="standBlackjack()">Rester (Stand)</button>
                         </div>
                     </div>
@@ -510,7 +582,7 @@
             <!-- MACHINES A SOUS -->
             <div id="slots-panel" class="game-panel">
                 <h2>Machines à Sous</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Alignez 3 symboles identiques pour le Jackpot !</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Tentez votre chance et alignez 3 symboles identiques pour décrocher le gros lot.</p>
                 <div class="game-grid">
                     <div class="table-display" style="justify-content: center;">
                         <div class="slot-machine">
@@ -518,7 +590,7 @@
                             <div class="slot-reel" id="slot-2">🍋</div>
                             <div class="slot-reel" id="slot-3">🔔</div>
                         </div>
-                        <div class="status-msg" id="slot-status">Prêt à jouer ?</div>
+                        <div class="status-msg" id="slot-status">Prêt à tenter le jackpot ?</div>
                     </div>
                     <div class="controls-box">
                         <div class="form-group">
@@ -532,8 +604,8 @@
 
             <!-- ROULETTE -->
             <div id="roulette-panel" class="game-panel">
-                <h2>Roulette Européenne (Couleurs)</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Misez sur le Rouge ou le Noir (Gain x2).</p>
+                <h2>Roulette Européenne</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Misez sur le Rouge ou le Noir pour doubler votre mise instantanément.</p>
                 <div class="game-grid">
                     <div class="table-display" style="justify-content: center;">
                         <div class="roulette-wheel" id="roulette-wheel-display">ROULETTE</div>
@@ -545,7 +617,7 @@
                             <input type="number" id="roulette-bet" class="form-control" value="50" min="10">
                         </div>
                         <button class="btn" style="background: var(--accent-red); color: white; margin-bottom: 0.5rem;" onclick="playRoulette('Rouge')">Miser sur ROUGE</button>
-                        <button class="btn" style="background: #1e293b; color: white; border: 1px solid #475569;" onclick="playRoulette('Noir')">Miser sur NOIR</button>
+                        <button class="btn" style="background: var(--bg-deep); color: white; border: 1px solid var(--border-color);" onclick="playRoulette('Noir')">Miser sur NOIR</button>
                     </div>
                 </div>
             </div>
@@ -553,7 +625,7 @@
             <!-- JEU DE DE -->
             <div id="dice-panel" class="game-panel">
                 <h2>Le Jeu du Dé</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Devinez sur quelle face le dé va tomber (1 à 6). Gain x5 !</p>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Devinez sur quelle face le dé va s'arrêter pour multiplier votre mise par 5.</p>
                 <div class="game-grid">
                     <div class="table-display" style="justify-content: center;">
                         <div style="font-size: 5rem;" id="dice-result">⚀</div>
@@ -582,8 +654,8 @@
 
             <!-- CLASSEMENT -->
             <div id="leaderboard-panel" class="game-panel">
-                <h2>Classement des Clients</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Les meilleurs joueurs et visiteurs de l'établissement.</p>
+                <h2>Classement des Clients VIP</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Découvrez les meilleurs joueurs et clients de l'établissement.</p>
                 <table class="leaderboard-table">
                     <thead>
                         <tr>
@@ -593,7 +665,7 @@
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body">
-                        <!-- Rempli dynamiquement -->
+                        <!-- Généré dynamiquement -->
                     </tbody>
                 </table>
             </div>
@@ -603,17 +675,12 @@
     <div id="toast-container"></div>
 
     <script>
-        /* ============================================================
-           CONFIGURATION & CONSTANTES
-           ============================================================ */
         const STORAGE_KEYS = {
-            users: 'aufildutemps_users_v1',
-            current: 'aufildutemps_current_user_v1'
+            users: 'aufildutemps_users_v2',
+            current: 'aufildutemps_current_user_v2'
         };
 
         const GAME_RULES = {
-            minBetDefault: 10,
-            minBetDice: 10,
             blackjackPayout: 1.5,
             slotMinorMultiplier: 2,
             slotJackpotMultiplier: 10,
@@ -624,24 +691,22 @@
         let users = [];
         let currentUser = null;
 
-        // Sons synthétiques via Web Audio API
+        // Audio synthétique
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playSfx(type) {
             if (!audioCtx) return;
             if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-            
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-
             const now = audioCtx.currentTime;
 
             if (type === 'card') {
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(300, now);
                 osc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
-                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.setValueAtTime(0.2, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
                 osc.start(now);
                 osc.stop(now + 0.08);
@@ -650,30 +715,25 @@
                 osc.frequency.setValueAtTime(440, now);
                 osc.frequency.setValueAtTime(554.37, now + 0.1);
                 osc.frequency.setValueAtTime(659.25, now + 0.2);
-                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.setValueAtTime(0.15, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
                 osc.start(now);
                 osc.stop(now + 0.4);
-            } else if (type === 'slot' || type === 'roulette' || type === 'dice') {
+            } else {
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(120, now);
                 osc.frequency.exponentialRampToValueAtTime(80, now + 0.15);
-                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.setValueAtTime(0.1, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
                 osc.start(now);
                 osc.stop(now + 0.15);
             }
         }
 
-        /* ============================================================
-           GESTION PERSISTANCE & AUTH
-           ============================================================ */
         function loadStorage() {
             try {
-                const storedUsers = localStorage.getItem(STORAGE_KEYS.users);
-                users = storedUsers ? JSON.parse(storedUsers) : [];
-                const storedCurrent = localStorage.getItem(STORAGE_KEYS.current);
-                currentUser = storedCurrent ? JSON.parse(storedCurrent) : null;
+                users = JSON.parse(localStorage.getItem(STORAGE_KEYS.users)) || [];
+                currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.current)) || null;
             } catch(e) {
                 users = [];
                 currentUser = null;
@@ -687,7 +747,7 @@
         function initApp() {
             loadStorage();
             if (currentUser) {
-                const found = users.find(u => u.id === currentUser.id);
+                let found = users.find(u => u.id === currentUser.id);
                 if (!found) {
                     users.push(currentUser);
                     persist(STORAGE_KEYS.users, users);
@@ -700,27 +760,20 @@
         }
 
         function handleAuth() {
-            const pseudoInput = document.getElementById('auth-pseudo');
-            const pseudo = pseudoInput.value.trim();
+            const pseudo = document.getElementById('auth-pseudo').value.trim();
             if (!pseudo) {
                 showToast("Veuillez entrer un pseudo valide.", "error");
                 return;
             }
-
             let user = users.find(u => u.name.toLowerCase() === pseudo.toLowerCase());
             if (!user) {
-                user = {
-                    id: 'usr_' + Date.now(),
-                    name: pseudo,
-                    points: 1000
-                };
+                user = { id: 'usr_' + Date.now(), name: pseudo, points: 1000 };
                 users.push(user);
                 persist(STORAGE_KEYS.users, users);
                 showToast(`Bienvenue chez 'Au Fil du Temps', ${pseudo} ! 1000 jetons offerts.`, "success");
             } else {
                 showToast(`Bon retour parmi nous, ${user.name} !`, "success");
             }
-
             currentUser = user;
             persist(STORAGE_KEYS.current, currentUser);
             showAppUI();
@@ -730,7 +783,7 @@
             currentUser = null;
             localStorage.removeItem(STORAGE_KEYS.current);
             showAuthUI();
-            showToast("Vous avez été déconnecté.", "success");
+            showToast("Déconnexion réussie.", "success");
         }
 
         function showAuthUI() {
@@ -758,66 +811,41 @@
             toast.className = `toast ${type}`;
             toast.innerText = message;
             container.appendChild(toast);
-            setTimeout(() => {
-                toast.remove();
-            }, 3500);
+            setTimeout(() => toast.remove(), 3500);
         }
 
         function switchTab(tabId) {
             document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-
             document.getElementById(`${tabId}-panel`).classList.add('active');
             event.currentTarget.classList.add('active');
-
-            if (tabId === 'leaderboard') {
-                renderLeaderboard();
-            }
+            if (tabId === 'leaderboard') renderLeaderboard();
         }
 
         function readBet(elementId, minVal) {
             const val = parseInt(document.getElementById(elementId).value, 10);
             if (isNaN(val) || val < minVal) {
-                showToast(`La mise minimale est de ${minVal} jetons.`, 'error');
+                showToast(`Mise minimale requise : ${minVal} jetons.`, 'error');
                 return null;
             }
             return val;
         }
 
-        /* ============================================================
-           BLACKJACK
-           ============================================================ */
-        let bjDeck = [];
-        let pHand = [];
-        let dHand = [];
-        let bjBet = 0;
-        let bjLocked = false;
-
+        // Blackjack
+        let bjDeck = [], pHand = [], dHand = [], bjBet = 0, bjLocked = false;
         function createDeck() {
             const suits = ['♠', '♣', '♥', '♦'];
             const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
             let deck = [];
-            suits.forEach(s => {
-                values.forEach(v => {
-                    deck.push({ suit: s, val: v });
-                });
-            });
-            for (let i = deck.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [deck[i], deck[j]] = [deck[j], deck[i]];
-            }
-            return deck;
+            suits.forEach(s => values.forEach(v => deck.push({ suit: s, val: v })));
+            return deck.sort(() => Math.random() - 0.5);
         }
 
         function startBlackjack() {
             if (bjLocked) return;
-            bjBet = readBet('bj-bet', GAME_RULES.minBetDefault);
+            bjBet = readBet('bj-bet', 10);
             if (bjBet === null) return;
-
-            if (currentUser.points < bjBet) {
-                showToast("Solde insuffisant pour cette mise.", "error");
-                return;
-            }
+            if (currentUser.points < bjBet) { showToast("Solde insuffisant.", "error"); return; }
 
             currentUser.points -= bjBet;
             updateUserStorage();
@@ -828,14 +856,11 @@
             dHand = [bjDeck.pop(), bjDeck.pop()];
 
             renderBj(false);
-
             document.getElementById('bj-start-btn').style.display = 'none';
             document.getElementById('bj-actions').style.display = 'flex';
 
-            const playerHasBlackjack = calcHand(pHand) === 21;
-            const dealerHasBlackjack = calcHand(dHand) === 21;
-            if (playerHasBlackjack || dealerHasBlackjack) {
-                endBlackjack(playerHasBlackjack, dealerHasBlackjack);
+            if (calcHand(pHand) === 21 || calcHand(dHand) === 21) {
+                endBlackjack(calcHand(pHand) === 21, calcHand(dHand) === 21);
             }
         }
 
@@ -843,16 +868,12 @@
             playSfx('card');
             pHand.push(bjDeck.pop());
             renderBj(false);
-            if (calcHand(pHand) > 21) {
-                endBlackjack(false, false);
-            }
+            if (calcHand(pHand) > 21) endBlackjack(false, false);
         }
 
         function standBlackjack() {
             playSfx('card');
-            while (calcHand(dHand) < 17) {
-                dHand.push(bjDeck.pop());
-            }
+            while (calcHand(dHand) < 17) dHand.push(bjDeck.pop());
             endBlackjack(false, false);
         }
 
@@ -860,62 +881,40 @@
             let sum = 0, aces = 0;
             hand.forEach(c => {
                 if (c.val === 'A') { aces++; sum += 11; }
-                else if (['K', 'Q', 'J', '10'].includes(c.val)) { sum += 10; }
-                else { sum += parseInt(c.val, 10); }
+                else if (['K', 'Q', 'J', '10'].includes(c.val)) sum += 10;
+                else sum += parseInt(c.val, 10);
             });
             while (sum > 21 && aces > 0) { sum -= 10; aces--; }
             return sum;
         }
 
-        function renderBj(revealDealer) {
+        function renderBj(reveal) {
             const pCardsEl = document.getElementById('bj-player-cards');
             const dCardsEl = document.getElementById('bj-dealer-cards');
-            const dInfoEl = document.getElementById('bj-dealer-info');
-            const statusEl = document.getElementById('bj-status');
-
             pCardsEl.innerHTML = pHand.map(c => `<div class="playing-card${['♥', '♦'].includes(c.suit) ? ' red' : ''}"><span>${c.val}</span><span style="font-size:1.4rem;">${c.suit}</span><span>${c.val}</span></div>`).join('');
-            
-            if (revealDealer) {
+            if (reveal) {
                 dCardsEl.innerHTML = dHand.map(c => `<div class="playing-card${['♥', '♦'].includes(c.suit) ? ' red' : ''}"><span>${c.val}</span><span style="font-size:1.4rem;">${c.suit}</span><span>${c.val}</span></div>`).join('');
-                dInfoEl.innerHTML = `Croupier (Total: ${calcHand(dHand)})`;
+                document.getElementById('bj-dealer-info').innerText = `Croupier (Total: ${calcHand(dHand)})`;
             } else {
-                dCardsEl.innerHTML = `<div class="playing-card${['♥', '♦'].includes(dHand[0].suit) ? ' red' : ''}"><span>${dHand[0].val}</span><span style="font-size:1.4rem;">${dHand[0].suit}</span><span>${dHand[0].val}</span></div><div class="playing-card" style="background: #334155; color: #94a3b8; display:flex; align-items:center; justify-content:center;">?</div>`;
-                dInfoEl.innerHTML = `Croupier`;
+                dCardsEl.innerHTML = `<div class="playing-card${['♥', '♦'].includes(dHand[0].suit) ? ' red' : ''}"><span>${dHand[0].val}</span><span style="font-size:1.4rem;">${dHand[0].suit}</span><span>${dHand[0].val}</span></div><div class="playing-card" style="background: var(--bg-card); color: var(--text-muted); display:flex; align-items:center; justify-content:center;">?</div>`;
+                document.getElementById('bj-dealer-info').innerText = `Croupier`;
             }
-            statusEl.innerText = `Votre score : ${calcHand(pHand)}`;
+            document.getElementById('bj-status').innerText = `Votre score : ${calcHand(pHand)}`;
         }
 
-        function endBlackjack(pBlackjack, dBlackjack) {
+        function endBlackjack(pBJ, dBJ) {
             bjLocked = true;
             renderBj(true);
-            const pScore = calcHand(pHand);
-            const dScore = calcHand(dHand);
+            const pScore = calcHand(pHand), dScore = calcHand(dHand);
             const statusEl = document.getElementById('bj-status');
-            let diff = 0;
 
-            if (pBlackjack && dBlackjack) {
-                statusEl.innerText = "Égalité (Blackjack des deux côtés) ! Mise remboursée.";
-                currentUser.points += bjBet;
-            } else if (pBlackjack) {
-                statusEl.innerText = "Blackjack ! Vous remportez 2.5x votre mise.";
-                diff = Math.round(bjBet * GAME_RULES.blackjackPayout);
-                currentUser.points += bjBet + diff;
-                playSfx('win');
-            } else if (dBlackjack) {
-                statusEl.innerText = "Le croupier a un Blackjack. Vous perdez.";
-            } else if (pScore > 21) {
-                statusEl.innerText = "Vous avez sauté (bust) ! Vous perdez.";
-            } else if (dScore > 21 || pScore > dScore) {
-                statusEl.innerText = "Vous gagnez !";
-                diff = bjBet * 2;
-                currentUser.points += diff;
-                playSfx('win');
-            } else if (pScore === dScore) {
-                statusEl.innerText = "Égalité ! Mise remboursée.";
-                currentUser.points += bjBet;
-            } else {
-                statusEl.innerText = "Le croupier l'emporte. Vous perdez.";
-            }
+            if (pBJ && dBJ) { statusEl.innerText = "Égalité ! Mise remboursée."; currentUser.points += bjBet; }
+            else if (pBJ) { statusEl.innerText = "Blackjack ! Victoire éclatante !"; currentUser.points += bjBet + Math.round(bjBet * GAME_RULES.blackjackPayout); playSfx('win'); }
+            else if (dBJ) { statusEl.innerText = "Le croupier a un Blackjack. Perdu."; }
+            else if (pScore > 21) { statusEl.innerText = "Vous avez dépassé 21 (Bust) ! Perdu."; }
+            else if (dScore > 21 || pScore > dScore) { statusEl.innerText = "Vous remportez la partie !"; currentUser.points += bjBet * 2; playSfx('win'); }
+            else if (pScore === dScore) { statusEl.innerText = "Égalité ! Mise remboursée."; currentUser.points += bjBet; }
+            else { statusEl.innerText = "Le croupier l'emporte."; }
 
             updateUserStorage();
             document.getElementById('bj-actions').style.display = 'none';
@@ -923,15 +922,10 @@
             bjLocked = false;
         }
 
-        /* ============================================================
-           MACHINES A SOUS
-           ============================================================ */
+        // Machines à sous
         function playSlots() {
-            const bet = readBet('slot-bet', GAME_RULES.minBetDefault);
-            if (bet === null || currentUser.points < bet) {
-                if (currentUser.points < bet) showToast("Solde insuffisant.", 'error');
-                return;
-            }
+            const bet = readBet('slot-bet', 10);
+            if (bet === null || currentUser.points < bet) { if (currentUser.points < bet) showToast("Solde insuffisant.", 'error'); return; }
             currentUser.points -= bet;
             updateUserStorage();
             playSfx('slot');
@@ -947,16 +941,10 @@
 
             const statusEl = document.getElementById('slot-status');
             let diff = 0;
-
             if (s1 === s2 && s2 === s3) {
-                if (s1 === '7️⃣' || s1 === '💎') {
-                    diff = bet * GAME_RULES.slotJackpotMultiplier;
-                    statusEl.innerText = `🔥 JACKPOT ! +${diff} jetons !`;
-                } else {
-                    diff = bet * GAME_RULES.slotMinorMultiplier * 2;
-                    statusEl.innerText = `✨ Super Gain ! +${diff} jetons !`;
-                }
+                diff = (s1 === '7️⃣' || s1 === '💎') ? bet * GAME_RULES.slotJackpotMultiplier : bet * GAME_RULES.slotMinorMultiplier * 2;
                 currentUser.points += diff;
+                statusEl.innerText = `🔥 JACKPOT ! +${diff} jetons !`;
                 playSfx('win');
             } else if (s1 === s2 || s2 === s3 || s1 === s3) {
                 diff = bet * GAME_RULES.slotMinorMultiplier;
@@ -966,87 +954,61 @@
             } else {
                 statusEl.innerText = "Dommage, retentez votre chance !";
             }
-
             updateUserStorage();
         }
 
-        /* ============================================================
-           ROULETTE
-           ============================================================ */
+        // Roulette
         function playRoulette(choice) {
-            const bet = readBet('roulette-bet', GAME_RULES.minBetDefault);
-            if (bet === null || currentUser.points < bet) {
-                if (currentUser.points < bet) showToast("Solde insuffisant.", 'error');
-                return;
-            }
+            const bet = readBet('roulette-bet', 10);
+            if (bet === null || currentUser.points < bet) { if (currentUser.points < bet) showToast("Solde insuffisant.", 'error'); return; }
             currentUser.points -= bet;
             updateUserStorage();
-            playSfx('roulette');
+            playSfx('slot');
 
-            const colors = ['Rouge', 'Noir', 'Rouge', 'Noir', 'Rouge', 'Noir', 'Rouge', 'Noir', 'Rouge', 'Noir'];
+            const colors = ['Rouge', 'Noir', 'Rouge', 'Noir', 'Rouge', 'Noir'];
             const resultColor = colors[Math.floor(Math.random() * colors.length)];
             const statusEl = document.getElementById('roulette-status');
 
-            let win = (resultColor === choice);
-            let diff = 0;
-
-            if (win) {
-                diff = bet * GAME_RULES.rouletteMultiplier;
+            if (resultColor === choice) {
+                let diff = bet * GAME_RULES.rouletteMultiplier;
                 currentUser.points += diff;
                 statusEl.innerText = `🎉 Gagné ! C'était ${resultColor}. +${diff} jetons !`;
                 playSfx('win');
             } else {
                 statusEl.innerText = `❌ Perdu ! C'était ${resultColor}.`;
             }
-
             updateUserStorage();
         }
 
-        /* ============================================================
-           JEU DU DÉ
-           ============================================================ */
+        // Dé
         function playDice() {
-            const bet = readBet('dice-bet', GAME_RULES.minBetDice);
-            if (bet === null || currentUser.points < bet) {
-                if (currentUser.points < bet) showToast("Solde insuffisant.", 'error');
-                return;
-            }
+            const bet = readBet('dice-bet', 10);
+            if (bet === null || currentUser.points < bet) { if (currentUser.points < bet) showToast("Solde insuffisant.", 'error'); return; }
             const choice = parseInt(document.getElementById('dice-choice').value, 10);
-
             currentUser.points -= bet;
             updateUserStorage();
-            playSfx('dice');
+            playSfx('slot');
 
             const roll = Math.floor(Math.random() * 6) + 1;
             const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
             document.getElementById('dice-result').innerText = diceFaces[roll - 1];
 
             const statusEl = document.getElementById('dice-status');
-            let win = (roll === choice);
-            let diff = 0;
-
-            if (win) {
-                diff = bet * GAME_RULES.diceMultiplier;
+            if (roll === choice) {
+                let diff = bet * GAME_RULES.diceMultiplier;
                 currentUser.points += diff;
-                statusEl.innerText = `🎯 Incroyable ! Le dé est tombé sur ${roll}. +${diff} jetons !`;
+                statusEl.innerText = `🎯 Bien vu ! Le dé indique ${roll}. +${diff} jetons !`;
                 playSfx('win');
             } else {
-                statusEl.innerText = `❌ Le dé est tombé sur ${roll}. Perdu.`;
+                statusEl.innerText = `❌ Le dé indique ${roll}. Perdu.`;
             }
-
             updateUserStorage();
         }
 
-        /* ============================================================
-           CLASSEMENT ET UTILITAIRES
-           ============================================================ */
         function updateUserStorage() {
             persist(STORAGE_KEYS.current, currentUser);
             const idx = users.findIndex(u => u.id === currentUser.id);
-            if (idx !== -1) { 
-                users[idx] = currentUser; 
-                persist(STORAGE_KEYS.users, users); 
-            }
+            if (idx !== -1) { users[idx] = currentUser; persist(STORAGE_KEYS.users, users); }
             updatePointsDisplay();
             renderLeaderboard();
         }
@@ -1054,12 +1016,10 @@
         function renderLeaderboard() {
             const tbody = document.getElementById('leaderboard-body');
             if (!tbody) return;
-
-            const sortedUsers = [...users].sort((a, b) => b.points - a.points);
-
-            tbody.innerHTML = sortedUsers.map((u, index) => `
-                <tr ${currentUser && u.id === currentUser.id ? 'style="background: rgba(251, 191, 36, 0.1); font-weight: bold;"' : ''}>
-                    <td>#${index + 1}</td>
+            const sorted = [...users].sort((a, b) => b.points - a.points);
+            tbody.innerHTML = sorted.map((u, i) => `
+                <tr ${currentUser && u.id === currentUser.id ? 'style="background: rgba(245, 158, 11, 0.15); font-weight: bold;"' : ''}>
+                    <td>#${i + 1}</td>
                     <td>${u.name} ${currentUser && u.id === currentUser.id ? '(Vous)' : ''}</td>
                     <td>💎 ${u.points}</td>
                 </tr>
