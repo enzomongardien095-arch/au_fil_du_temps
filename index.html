@@ -158,6 +158,30 @@
         .menu-item-info p { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-style: italic; }
         .menu-price { font-family: var(--font-heading), serif; font-size: 1.2rem; color: #fff; font-weight: 700; white-space: nowrap; }
 
+        /* --- SÉLECTEUR DE PLATS (panneau commande) --- */
+        .dish-picker { display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding-right: 4px; margin-bottom: 5px; }
+        .dish-pick-card {
+            display: flex; justify-content: space-between; align-items: center; gap: 10px;
+            background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 8px;
+            padding: 12px 14px; transition: all 0.25s ease; text-align: left;
+        }
+        .dish-pick-card:hover { border-color: var(--gold-dark); }
+        .dish-pick-card.selected { border-color: var(--gold-primary); background: rgba(212, 175, 55, 0.12); box-shadow: 0 0 0 1px var(--gold-primary) inset; }
+        .dish-pick-card .dish-pick-name { font-family: var(--font-heading), serif; color: var(--gold-primary); font-size: 1rem; }
+        .dish-pick-card .dish-pick-desc { font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-top: 3px; }
+        .dish-pick-card .dish-pick-price { font-family: var(--font-heading), serif; color: #fff; font-weight: 700; white-space: nowrap; }
+        .qty-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .qty-btn {
+            width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--gold-primary);
+            background: rgba(212, 175, 55, 0.1); color: var(--gold-primary); font-size: 1.1rem; font-weight: 700;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; transition: all 0.2s ease;
+        }
+        .qty-btn:hover { background: var(--gold-primary); color: #000; }
+        .qty-btn:active { transform: scale(0.92); }
+        .qty-value { min-width: 18px; text-align: center; font-family: var(--font-heading), serif; font-size: 1.05rem; color: #fff; }
+        .order-summary { background: rgba(212, 175, 55, 0.08); border: 1px dashed var(--gold-dark); border-radius: 8px; padding: 12px 14px; margin: 15px 0; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
+        .order-summary.empty { color: var(--text-muted); font-style: italic; justify-content: center; }
+
         /* --- CASINO TABLES --- */
         .casino-table {
             background: radial-gradient(circle at center, #0f3d24 0%, #061c10 100%);
@@ -289,9 +313,10 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="order-plat">Choix du plat</label>
-                                <select id="order-plat" required></select>
+                                <label>Choix des plats</label>
+                                <div id="order-plat-picker" class="dish-picker" aria-label="Sélection des plats et quantités"></div>
                             </div>
+                            <div id="order-summary" class="order-summary empty">Aucun plat sélectionné</div>
                             <button type="submit" class="btn" style="width: 100%;">Transmettre au Chef</button>
                         </form>
                     </div>
@@ -1154,33 +1179,123 @@
         /* ============================================================
            MENU RESTAURANT
            ============================================================ */
+        let orderCart = {};
+
         function renderMenu() {
             const grid = document.getElementById('menu-grid');
-            const select = document.getElementById('order-plat');
+            const picker = document.getElementById('order-plat-picker');
             grid.innerHTML = '';
-            select.innerHTML = '';
+            if (picker) picker.innerHTML = '';
+
+            // Nettoie le panier des plats qui n'existent plus
+            Object.keys(orderCart).forEach(id => { if (!findDishById(id)) delete orderCart[id]; });
+
+            if (menuItems.length === 0) {
+                grid.innerHTML = `<p style="color:var(--text-muted);">Le chef prépare la carte...</p>`;
+                if (picker) picker.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">Aucun plat disponible pour le moment.</p>`;
+                updateOrderSummary();
+                return;
+            }
+
             menuItems.forEach(item => {
                 grid.innerHTML += `<div class="menu-item"><div class="menu-item-info"><h4>${escapeHtml(item.name)}</h4><p>${escapeHtml(item.desc)}</p></div><div class="menu-price">${escapeHtml(item.price)}</div></div>`;
-                const opt = document.createElement('option');
-                opt.value = item.id;
-                opt.textContent = `${item.name} (${item.price})`;
-                select.appendChild(opt);
+                if (picker) {
+                    const qty = orderCart[item.id] || 0;
+                    picker.innerHTML += `
+                        <div class="dish-pick-card${qty > 0 ? ' selected' : ''}" data-dish-id="${item.id}">
+                            <div style="flex:1;">
+                                <div class="dish-pick-name">${escapeHtml(item.name)}</div>
+                                <div class="dish-pick-desc">${escapeHtml(item.desc)}</div>
+                                <div class="dish-pick-price" style="margin-top:4px;">${escapeHtml(item.price)}</div>
+                            </div>
+                            <div class="qty-controls">
+                                <button type="button" class="qty-btn" aria-label="Retirer un ${escapeHtml(item.name)}" onclick="changeDishQty('${item.id}', -1)">−</button>
+                                <span class="qty-value" id="qty-${item.id}">${qty}</span>
+                                <button type="button" class="qty-btn" aria-label="Ajouter un ${escapeHtml(item.name)}" onclick="changeDishQty('${item.id}', 1)">+</button>
+                            </div>
+                        </div>`;
+                }
             });
+
+            updateOrderSummary();
+        }
+
+        function changeDishQty(id, delta) {
+            const dish = findDishById(id);
+            if (!dish) return;
+            const newQty = Math.max(0, (orderCart[id] || 0) + delta);
+            if (newQty === 0) { delete orderCart[id]; } else { orderCart[id] = newQty; }
+
+            const qtyEl = document.getElementById(`qty-${id}`);
+            if (qtyEl) qtyEl.textContent = newQty;
+            const card = document.querySelector(`.dish-pick-card[data-dish-id="${id}"]`);
+            if (card) card.classList.toggle('selected', newQty > 0);
+
+            updateOrderSummary();
+        }
+
+        function parsePriceNumber(price) {
+            const match = String(price).replace(',', '.').match(/[\d.]+/);
+            return match ? parseFloat(match[0]) : null;
+        }
+
+        function updateOrderSummary() {
+            const summary = document.getElementById('order-summary');
+            if (!summary) return;
+            const entries = Object.entries(orderCart).filter(([, qty]) => qty > 0);
+
+            if (entries.length === 0) {
+                summary.classList.add('empty');
+                summary.innerHTML = "Aucun plat sélectionné";
+                return;
+            }
+
+            summary.classList.remove('empty');
+            let total = 0;
+            let totalKnown = true;
+            const lines = entries.map(([id, qty]) => {
+                const dish = findDishById(id);
+                if (!dish) return '';
+                const unit = parsePriceNumber(dish.price);
+                if (unit === null) { totalKnown = false; } else { total += unit * qty; }
+                return `<div style="display:flex; justify-content:space-between; width:100%;"><span>${qty}× ${escapeHtml(dish.name)}</span><span>${escapeHtml(dish.price)}</span></div>`;
+            }).join('');
+
+            const totalLine = totalKnown
+                ? `<div style="display:flex; justify-content:space-between; width:100%; margin-top:8px; padding-top:8px; border-top: 1px dashed var(--gold-dark); font-family: var(--font-heading), serif; color: var(--gold-light);"><span>Total</span><span>${total.toFixed(2).replace(/\.00$/, '')} $</span></div>`
+                : '';
+
+            summary.innerHTML = `<div style="display:flex; flex-direction:column; gap:4px; width:100%;">${lines}${totalLine}</div>`;
+        }
+
+        function resetOrderCart() {
+            orderCart = {};
+            document.querySelectorAll('#order-plat-picker .dish-pick-card').forEach(card => {
+                card.classList.remove('selected');
+                const qtyEl = card.querySelector('.qty-value');
+                if (qtyEl) qtyEl.textContent = '0';
+            });
+            updateOrderSummary();
         }
 
         function submitOrder(e) {
             e.preventDefault();
             const nom = document.getElementById('order-nom').value.trim();
             const prenom = document.getElementById('order-prenom').value.trim();
-            const dishId = document.getElementById('order-plat').value;
-            const dish = findDishById(dishId);
-            if (!nom || !prenom || !dish) { showToast("Merci de renseigner votre identité et un plat valide.", 'error'); return; }
+            const entries = Object.entries(orderCart).filter(([, qty]) => qty > 0);
+            const items = entries.map(([id, qty]) => {
+                const dish = findDishById(id);
+                return dish ? { name: dish.name, qty } : null;
+            }).filter(Boolean);
 
-            orders.push({ id: generateId(), nom, prenom, plat: dish.name, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            if (!nom || !prenom || items.length === 0) { showToast("Merci de renseigner votre identité et de choisir au moins un plat.", 'error'); return; }
+
+            orders.push({ id: generateId(), nom, prenom, items, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
             persist(STORAGE_KEYS.orders, orders);
             showToast("Votre commande a été transmise au chef.", 'success');
             renderAdminOrders();
             e.target.reset();
+            resetOrderCart();
             if (currentUser) {
                 document.getElementById('order-nom').value = currentUser.nom;
                 document.getElementById('order-prenom').value = currentUser.prenom;
@@ -1194,11 +1309,16 @@
             const container = document.getElementById('admin-orders-list');
             if (!container) return;
             if (orders.length === 0) { container.innerHTML = `<p style="color:var(--text-muted);">Aucune commande en cours.</p>`; return; }
-            container.innerHTML = orders.map(ord => `
+            container.innerHTML = orders.map(ord => {
+                const detail = Array.isArray(ord.items)
+                    ? ord.items.map(it => `${it.qty}× ${escapeHtml(it.name)}`).join(', ')
+                    : escapeHtml(ord.plat || '');
+                return `
                 <div class="admin-row">
-                    <div><strong style="color:var(--gold-light);">${escapeHtml(ord.prenom)} ${escapeHtml(ord.nom)}</strong><br><span style="font-size:0.85rem;">Plat: ${escapeHtml(ord.plat)}</span></div>
+                    <div><strong style="color:var(--gold-light);">${escapeHtml(ord.prenom)} ${escapeHtml(ord.nom)}</strong><br><span style="font-size:0.85rem;">${detail}</span></div>
                     <button type="button" class="btn" style="padding:4px 10px; font-size:0.7rem;" onclick="completeOrder('${ord.id}')">Servir</button>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         }
         function completeOrder(id) { orders = orders.filter(o => o.id !== id); persist(STORAGE_KEYS.orders, orders); renderAdminOrders(); }
 
@@ -1244,6 +1364,7 @@
                         <div style="display:flex; gap:5px; margin-top:4px;">
                             <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 6px; cursor:pointer;" onclick="toggleRole('${u.id}', 'employe')">${u.employe ? '- Staff' : '+ Staff'}</button>
                             <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 6px; cursor:pointer;" onclick="toggleRole('${u.id}', 'isVip')">${u.isVip ? '- VIP' : '+ VIP'}</button>
+                            <button type="button" class="btn-danger" style="font-size:0.65rem; padding:3px 6px; border-radius:4px; border:none; cursor:pointer;" onclick="deleteUser('${u.id}')">Supprimer</button>
                         </div>
                     </div>
                 </div>`).join('');
@@ -1288,6 +1409,24 @@
             persist(STORAGE_KEYS.users, users);
             if (currentUser && currentUser.id === target.id) { currentUser[roleProp] = target[roleProp]; persist(STORAGE_KEYS.current, currentUser); checkAuthUI(); }
             renderAdminUsers();
+        }
+
+        function deleteUser(id) {
+            const target = findUserById(id);
+            if (!target) return;
+            if (!window.confirm(`Supprimer définitivement ${target.prenom} ${target.nom} du registre ?`)) return;
+
+            users = users.filter(u => u && u.id !== id);
+            persist(STORAGE_KEYS.users, users);
+
+            if (currentUser && currentUser.id === id) {
+                showToast("Votre compte a été supprimé par un membre du staff.", 'error');
+                logout();
+            }
+
+            renderAdminUsers();
+            renderLeaderboard();
+            showToast(`${target.prenom} ${target.nom} a été supprimé(e) du registre.`, 'success');
         }
 
         function addNewDish(e) {
