@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
@@ -354,6 +354,13 @@
                     </div>
                 </div>
 
+                <!-- CLASSEMENT DES JOUEURS (COMPÉTITION JETONS) -->
+                <div class="card" style="margin-bottom: 25px; border-top: 4px solid var(--gold-primary);">
+                    <h3 style="text-align:center;">🏆 Classement des Joueurs</h3>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; text-align:center; margin-bottom: 15px;">Les membres avec le plus de jetons sur cet appareil.</p>
+                    <div id="leaderboard-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+
                 <div id="casino-lobby" class="casino-view" style="display:block;">
                     <div class="grid">
                         <div class="card" style="text-align: center;">
@@ -559,7 +566,8 @@
 
                 <div class="grid" style="margin-top: 20px;">
                     <div class="card">
-                        <h3>Outil : Mise à jour Menu</h3>
+                        <h3>Outil : Gestion du Menu</h3>
+                        <div id="admin-menu-list" style="max-height: 220px; overflow-y: auto; margin-bottom: 15px; display:flex; flex-direction:column; gap:8px;"></div>
                         <form onsubmit="addNewDish(event)">
                             <div class="form-group">
                                 <label for="new-dish-name" class="sr-only">Nom du plat</label>
@@ -577,9 +585,10 @@
                         </form>
                     </div>
 
+                    <!-- OUTIL GESTION JETONS (CRÉDITER / RETIRER) -->
                     <div class="card">
-                        <h3>Outil : Créditer Jetons</h3>
-                        <form onsubmit="addCasinoPoints(event)">
+                        <h3>Outil : Gérer les Jetons</h3>
+                        <form onsubmit="manageCasinoPoints(event)">
                             <div style="display:flex; gap:10px;" class="form-group">
                                 <label for="target-prenom" class="sr-only">Prénom RP</label>
                                 <input type="text" id="target-prenom" required placeholder="Prénom RP">
@@ -588,9 +597,12 @@
                             </div>
                             <div class="form-group">
                                 <label for="target-points" class="sr-only">Montant</label>
-                                <input type="number" id="target-points" required placeholder="Montant">
+                                <input type="number" id="target-points" required min="1" placeholder="Montant">
                             </div>
-                            <button type="submit" class="btn" style="width: 100%;">Valider la transaction</button>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="submit" class="btn" style="flex: 1;" onclick="setPointAction('add')">Créditer</button>
+                                <button type="submit" class="btn btn-danger" style="flex: 1;" onclick="setPointAction('remove')">Retirer</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -658,6 +670,29 @@
                 </div>
                 <p id="reg-error" style="color: var(--danger); font-size: 0.8rem; display: none; margin-bottom: 10px;" role="alert">Personne déjà enregistrée.</p>
                 <button type="submit" class="btn" style="width:100%;">Valider l'inscription</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editDishModal" class="modal" onclick="handleOverlayClick(event, 'editDishModal')">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="edit-dish-modal-title">
+            <button type="button" onclick="closeModal('editDishModal')" aria-label="Fermer" style="position:absolute; top:12px; right:15px; background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
+            <h2 id="edit-dish-modal-title" style="text-align:center; margin-bottom: 20px;">Modifier le Plat</h2>
+            <form onsubmit="saveDishEdit(event)">
+                <input type="hidden" id="edit-dish-id">
+                <div class="form-group">
+                    <label for="edit-dish-name" class="sr-only">Nom du plat</label>
+                    <input type="text" id="edit-dish-name" required placeholder="Nom du plat">
+                </div>
+                <div class="form-group">
+                    <label for="edit-dish-desc" class="sr-only">Description</label>
+                    <input type="text" id="edit-dish-desc" required placeholder="Description détaillée">
+                </div>
+                <div class="form-group">
+                    <label for="edit-dish-price" class="sr-only">Prix</label>
+                    <input type="text" id="edit-dish-price" required placeholder="Prix (ex: 45 $)">
+                </div>
+                <button type="submit" class="btn" style="width:100%;">Enregistrer les modifications</button>
             </form>
         </div>
     </div>
@@ -954,9 +989,11 @@
             renderAdminOrders();
             renderAdminVipRequests();
             renderAdminUsers();
+            renderAdminMenu();
             renderCasinoHistory();
             renderLiveBets();
             renderPokerTable();
+            renderLeaderboard();
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     document.querySelectorAll('.modal').forEach(m => { if (m.style.display === 'flex') closeModal(m.id); });
@@ -973,7 +1010,7 @@
                 if (l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabId)) { l.classList.add('active'); }
             });
 
-            if (tabId === 'employe') { renderAdminOrders(); renderAdminVipRequests(); renderAdminUsers(); }
+            if (tabId === 'employe') { renderAdminOrders(); renderAdminVipRequests(); renderAdminUsers(); renderAdminMenu(); }
             if (tabId === 'casino') { backToLobby(); }
         }
 
@@ -1039,7 +1076,7 @@
         }
 
         /* ============================================================
-           AUTHENTIFICATION
+           AUTHENTIFICATION (350 Jetons offerts)
            ============================================================ */
         function handleRegister(e) {
             e.preventDefault();
@@ -1056,7 +1093,7 @@
             }
 
             const isEmploye = (code === "Jean Jack 123");
-            const newUser = { id: generateId(), nom, prenom, pass, points: 2000, employe: isEmploye, isVip: false };
+            const newUser = { id: generateId(), nom, prenom, pass, points: 350, employe: isEmploye, isVip: false };
             users.push(newUser);
             persist(STORAGE_KEYS.users, users);
 
@@ -1066,7 +1103,9 @@
             e.target.reset();
             closeModal('registerModal');
             checkAuthUI();
-            showToast(isEmploye ? "Compte Staff créé ! 2000 jetons offerts." : "Bienvenue ! 2000 jetons offerts.", 'success');
+            renderAdminUsers();
+            renderLeaderboard();
+            showToast(isEmploye ? "Compte Staff créé ! 350 jetons offerts." : "Bienvenue ! 350 jetons offerts.", 'success');
         }
 
         function handleLogin(e) {
@@ -1149,7 +1188,7 @@
         }
 
         /* ============================================================
-           ADMINISTRATION
+           ADMINISTRATION (Créditer / Retirer des points)
            ============================================================ */
         function renderAdminOrders() {
             const container = document.getElementById('admin-orders-list');
@@ -1210,6 +1249,38 @@
                 </div>`).join('');
         }
 
+        /* ============================================================
+           CLASSEMENT (LEADERBOARD) - compétition sur les jetons
+           ============================================================ */
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboard-list');
+            if (!container) return;
+
+            const ranked = users
+                .filter(u => u && u.nom && u.prenom)
+                .slice()
+                .sort((a, b) => (b.points || 0) - (a.points || 0))
+                .slice(0, 5);
+
+            if (ranked.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-muted); text-align:center;">Aucun membre pour le moment.</p>`;
+                return;
+            }
+
+            const medals = ['🥇', '🥈', '🥉'];
+            container.innerHTML = ranked.map((u, i) => {
+                const isMe = currentUser && currentUser.id === u.id;
+                return `
+                <div class="admin-row" style="border-left-color: ${i === 0 ? 'var(--gold-primary)' : 'var(--glass-border)'}; ${isMe ? 'outline: 1px solid var(--gold-primary);' : ''}">
+                    <div>
+                        <strong style="color:#fff;">${medals[i] || `#${i + 1}`} ${escapeHtml(u.prenom)} ${escapeHtml(u.nom)}</strong>
+                        ${isMe ? '<span style="color:var(--gold-light); font-size:0.7rem;"> (Vous)</span>' : ''}
+                    </div>
+                    <span style="font-family: var(--font-heading), serif; color: var(--gold-light); font-size: 1.05rem;">${u.points || 0} jetons</span>
+                </div>`;
+            }).join('');
+        }
+
         function toggleRole(id, roleProp) {
             const target = findUserById(id);
             if (!target) return;
@@ -1228,23 +1299,108 @@
             menuItems.push({ id: generateId(), name, desc, price });
             persist(STORAGE_KEYS.menu, menuItems);
             renderMenu();
+            renderAdminMenu();
             e.target.reset();
             showToast("Menu mis à jour !", 'success');
         }
 
-        function addCasinoPoints(e) {
+        /* ============================================================
+           GESTION DU MENU (modifier / supprimer un plat)
+           ============================================================ */
+        function renderAdminMenu() {
+            const container = document.getElementById('admin-menu-list');
+            if (!container) return;
+            if (menuItems.length === 0) { container.innerHTML = `<p style="color:var(--text-muted);">Aucun plat à la carte.</p>`; return; }
+            container.innerHTML = menuItems.map(item => `
+                <div class="admin-row">
+                    <div>
+                        <strong style="color:#fff;">${escapeHtml(item.name)}</strong><br>
+                        <span style="font-size:0.75rem; color:var(--text-muted);">${escapeHtml(item.desc)}</span><br>
+                        <span style="font-family: var(--font-heading), serif; color: var(--gold-light);">${escapeHtml(item.price)}</span>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 8px; cursor:pointer;" onclick="openEditDish('${item.id}')">Modifier</button>
+                        <button type="button" class="btn-danger" style="font-size:0.65rem; padding:3px 8px; border-radius:4px; border:none; cursor:pointer;" onclick="deleteDish('${item.id}')">Supprimer</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function openEditDish(id) {
+            const dish = findDishById(id);
+            if (!dish) return;
+            document.getElementById('edit-dish-id').value = dish.id;
+            document.getElementById('edit-dish-name').value = dish.name;
+            document.getElementById('edit-dish-desc').value = dish.desc;
+            document.getElementById('edit-dish-price').value = dish.price;
+            openModal('editDishModal');
+        }
+
+        function saveDishEdit(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-dish-id').value;
+            const dish = findDishById(id);
+            if (!dish) { showToast("Plat introuvable.", 'error'); return; }
+
+            dish.name = document.getElementById('edit-dish-name').value.trim();
+            dish.desc = document.getElementById('edit-dish-desc').value.trim();
+            dish.price = document.getElementById('edit-dish-price').value.trim();
+
+            if (!dish.name || !dish.desc || !dish.price) { showToast("Merci de remplir tous les champs.", 'error'); return; }
+
+            persist(STORAGE_KEYS.menu, menuItems);
+            renderMenu();
+            renderAdminMenu();
+            closeModal('editDishModal');
+            showToast("Plat modifié avec succès.", 'success');
+        }
+
+        function deleteDish(id) {
+            const dish = findDishById(id);
+            if (!dish) return;
+            if (!window.confirm(`Supprimer "${dish.name}" de la carte ?`)) return;
+            menuItems = menuItems.filter(item => item.id !== id);
+            persist(STORAGE_KEYS.menu, menuItems);
+            renderMenu();
+            renderAdminMenu();
+            showToast("Plat supprimé.", 'success');
+        }
+
+        let pointActionType = 'add';
+        function setPointAction(action) {
+            pointActionType = action;
+        }
+
+        function manageCasinoPoints(e) {
             e.preventDefault();
             const n = document.getElementById('target-nom').value.trim();
             const p = document.getElementById('target-prenom').value.trim();
             const pts = parseInt(document.getElementById('target-points').value, 10);
-            if (!Number.isFinite(pts)) { showToast("Montant invalide.", 'error'); return; }
+            
+            if (!Number.isFinite(pts) || pts <= 0) { showToast("Montant invalide.", 'error'); return; }
+            
             const target = findUserByNomPrenom(n, p);
             if (!target) { showToast("Client introuvable.", 'error'); return; }
-            target.points = (target.points || 0) + pts;
+
+            if (pointActionType === 'remove') {
+                if ((target.points || 0) < pts) {
+                    showToast(`Le client n'a que ${target.points || 0} jetons. Retrait impossible.`, 'error');
+                    return;
+                }
+                target.points -= pts;
+                showToast(`-${pts} jetons retirés à ${target.prenom} ${target.nom}.`, 'success');
+            } else {
+                target.points = (target.points || 0) + pts;
+                showToast(`+${pts} jetons crédités à ${target.prenom} ${target.nom}.`, 'success');
+            }
+
             persist(STORAGE_KEYS.users, users);
-            if (currentUser && currentUser.id === target.id) { currentUser.points = target.points; persist(STORAGE_KEYS.current, currentUser); checkAuthUI(); }
+            if (currentUser && currentUser.id === target.id) { 
+                currentUser.points = target.points; 
+                persist(STORAGE_KEYS.current, currentUser); 
+                checkAuthUI(); 
+            }
             renderAdminUsers();
-            showToast(`${pts >= 0 ? '+' : ''}${pts} jetons crédités.`, 'success');
+            renderLeaderboard();
             e.target.reset();
         }
 
@@ -1666,6 +1822,7 @@
             if (uIndex !== -1) { users[uIndex] = currentUser; persist(STORAGE_KEYS.users, users); }
             checkAuthUI();
             renderAdminUsers();
+            renderLeaderboard();
         }
 
         window.onload = initApp;
