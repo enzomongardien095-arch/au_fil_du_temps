@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Casino Royale - Jeu de Casino Virtuel</title>
+    <title>Au Fil du Temps - Restaurant, Boîte de Nuit & Casino</title>
 
     <!-- INITIALISATION FIREBASE -->
     <script type="module">
@@ -18,9 +18,7 @@
         appId: "1:332938689848:web:cf18d6d9f1c10a84e455cd"
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
-      // Rendu accessible globalement pour vos scripts si besoin
       window.firebaseApp = app;
     </script>
 
@@ -31,6 +29,7 @@
             --accent-gold: #fbbf24;
             --accent-green: #10b981;
             --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
         }
@@ -175,7 +174,7 @@
             color: white;
         }
 
-        /* NAVIGATION DES JEUX */
+        /* NAVIGATION PRINCIPALE */
         .game-nav {
             display: flex;
             gap: 1rem;
@@ -215,7 +214,29 @@
             display: block;
         }
 
-        /* INTERFACES DE JEUX */
+        /* GRILLES ET CARTES RESTO / CLUB / CASINO */
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .info-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .info-card h3 {
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
         .game-grid {
             display: grid;
             grid-template-columns: 1fr 300px;
@@ -327,7 +348,7 @@
             color: var(--accent-gold);
         }
 
-        /* CLASSEMENT & HISTORIQUE */
+        /* CLASSEMENT & TABLES */
         .leaderboard-table {
             width: 100%;
             border-collapse: collapse;
@@ -376,7 +397,7 @@
 <body>
 
     <header>
-        <div class="logo">🎲 Casino Royale</div>
+        <div class="logo">🌙 Au Fil du Temps</div>
         <div class="user-info" id="header-user-info" style="display: none;">
             <span id="username-display" style="font-weight: 600;"></span>
             <div class="badge-jetons">💎 <span id="user-points">1000</span> jetons</div>
@@ -391,24 +412,77 @@
                 <h2>Connexion / Inscription</h2>
                 <div class="form-group">
                     <label for="auth-pseudo">Votre Pseudo</label>
-                    <input type="text" id="auth-pseudo" class="form-control" placeholder="Ex: Player123">
+                    <input type="text" id="auth-pseudo" class="form-control" placeholder="Ex: ClientVIP">
                 </div>
-                <button class="btn" onclick="handleAuth()">Entrer au Casino</button>
+                <button class="btn" onclick="handleAuth()">Accéder à l'établissement</button>
             </div>
         </div>
 
         <!-- APPLICATION PRINCIPALE -->
         <div id="app-container" style="display: none;">
             <div class="game-nav">
-                <button class="tab-btn active" onclick="switchTab('blackjack')">♠️ Blackjack</button>
+                <button class="tab-btn active" onclick="switchTab('restaurant')">🍽️ Restaurant</button>
+                <button class="tab-btn" onclick="switchTab('club')">🪩 Boîte de Nuit</button>
+                <button class="tab-btn" onclick="switchTab('blackjack')">♠️ Blackjack</button>
                 <button class="tab-btn" onclick="switchTab('slots')">🎰 Machines à Sous</button>
                 <button class="tab-btn" onclick="switchTab('roulette')">🎡 Roulette</button>
                 <button class="tab-btn" onclick="switchTab('dice')">🎲 Jeu de Dé</button>
                 <button class="tab-btn" onclick="switchTab('leaderboard')">🏆 Classement</button>
             </div>
 
+            <!-- RESTAURANT -->
+            <div id="restaurant-panel" class="game-panel active">
+                <h2>Le Restaurant Gastronomique</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Découvrez notre carte de saison et réservez votre table.</p>
+                <div class="content-grid">
+                    <div class="info-card">
+                        <div>
+                            <h3>Entrées Raffinées</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Foie gras maison, Velouté de cèpes truffé ou Saumon gravlax.</p>
+                        </div>
+                        <button class="btn" style="margin-top: 1rem;" onclick="showToast('Entrée commandée avec succès !', 'success')">Commander (150 jetons)</button>
+                    </div>
+                    <div class="info-card">
+                        <div>
+                            <h3>Plats Signature</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Pavé de bœuf Rossini, Homard bleu rôti ou Risotto aux morilles.</p>
+                        </div>
+                        <button class="btn" style="margin-top: 1rem;" onclick="showToast('Plat commandé avec succès !', 'success')">Commander (300 jetons)</button>
+                    </div>
+                    <div class="info-card">
+                        <div>
+                            <h3>Desserts & Douceurs</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Soufflé grand marnier, Tarte tatin revisitée ou Chocolat grand cru.</p>
+                        </div>
+                        <button class="btn" style="margin-top: 1rem;" onclick="showToast('Dessert commandé avec succès !', 'success')">Commander (100 jetons)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOITE DE NUIT -->
+            <div id="club-panel" class="game-panel">
+                <h2>La Boîte de Nuit - Club VIP</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Ambiance électrique, DJ sets exclusifs et piste de danse.</p>
+                <div class="content-grid">
+                    <div class="info-card" style="border-color: var(--accent-purple);">
+                        <div>
+                            <h3>Soirée Electro & House</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Ce samedi dès 23h00 avec DJ résident invités.</p>
+                        </div>
+                        <button class="btn" style="background: var(--accent-purple); color: white; margin-top: 1rem;" onclick="showToast('Entrée VIP réservée pour la soirée Electro !', 'success')">Réserver Entrée VIP</button>
+                    </div>
+                    <div class="info-card" style="border-color: var(--accent-purple);">
+                        <div>
+                            <h3>Accès Carré VIP</h3>
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">Bénéficiez d'une table réservée et d'un service exclusif.</p>
+                        </div>
+                        <button class="btn" style="background: var(--accent-purple); color: white; margin-top: 1rem;" onclick="showToast('Table VIP réservée avec succès !', 'success')">Réserver une Table</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- BLACKJACK -->
-            <div id="blackjack-panel" class="game-panel active">
+            <div id="blackjack-panel" class="game-panel">
                 <h2>Blackjack Classic</h2>
                 <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Tentez de battre le croupier sans dépasser 21.</p>
                 <div class="game-grid">
@@ -508,13 +582,13 @@
 
             <!-- CLASSEMENT -->
             <div id="leaderboard-panel" class="game-panel">
-                <h2>Classement des Joueurs</h2>
-                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Les meilleurs joueurs du casino.</p>
+                <h2>Classement des Clients</h2>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Les meilleurs joueurs et visiteurs de l'établissement.</p>
                 <table class="leaderboard-table">
                     <thead>
                         <tr>
                             <th>Rang</th>
-                            <th>Joueur</th>
+                            <th>Client</th>
                             <th>Jetons</th>
                         </tr>
                     </thead>
@@ -533,8 +607,8 @@
            CONFIGURATION & CONSTANTES
            ============================================================ */
         const STORAGE_KEYS = {
-            users: 'casino_users_v1',
-            current: 'casino_current_user_v1'
+            users: 'aufildutemps_users_v1',
+            current: 'aufildutemps_current_user_v1'
         };
 
         const GAME_RULES = {
@@ -642,7 +716,7 @@
                 };
                 users.push(user);
                 persist(STORAGE_KEYS.users, users);
-                showToast(`Bienvenue au Casino, ${pseudo} ! 1000 jetons offerts.`, "success");
+                showToast(`Bienvenue chez 'Au Fil du Temps', ${pseudo} ! 1000 jetons offerts.`, "success");
             } else {
                 showToast(`Bon retour parmi nous, ${user.name} !`, "success");
             }
