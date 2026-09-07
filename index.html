@@ -6,10 +6,6 @@
     <title>Au Fil du Temps | Complexe de Luxe</title>
     <!-- Importation sécurisée des polices -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase SDK (Compat v10) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root {
@@ -27,7 +23,9 @@
             --font-heading: 'Cinzel', serif;
             --font-body: 'Montserrat', sans-serif;
         }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             background-color: var(--bg-base);
             color: var(--text-main);
@@ -38,17 +36,24 @@
             overflow-x: hidden;
             background-image: radial-gradient(circle at 50% 0%, #1a1a24 0%, transparent 70%);
         }
+
+        /* Accessibilité : focus clavier toujours visible */
         a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
             outline: 2px solid var(--gold-primary);
             outline-offset: 2px;
         }
+
+        /* Respecte les préférences de mouvement réduit */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
         }
+
         .sr-only {
             position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
             overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
         }
+
+        /* --- HEADER & NAVIGATION --- */
         header {
             background: rgba(7, 7, 10, 0.95);
             backdrop-filter: blur(15px);
@@ -65,7 +70,9 @@
             flex-wrap: wrap;
             gap: 15px;
         }
+
         .logo-container { display: flex; align-items: center; gap: 15px; }
+
         .logo {
             font-family: var(--font-heading), serif;
             font-size: clamp(1.3rem, 4vw, 1.8rem);
@@ -74,7 +81,9 @@
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
             letter-spacing: 2px;
         }
+
         nav { display: flex; gap: 5px; flex-wrap: wrap; }
+
         nav a {
             color: var(--text-muted);
             text-decoration: none;
@@ -88,7 +97,10 @@
             cursor: pointer;
             position: relative;
         }
+
         nav a:hover, nav a.active { color: var(--gold-primary); background: rgba(212, 175, 55, 0.05); }
+
+        /* --- BOUTONS --- */
         .btn {
             background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
             color: #000;
@@ -105,15 +117,22 @@
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
             text-align: center;
         }
+
         .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4); filter: brightness(1.1); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; filter: none; }
+
         .btn-outline { background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); box-shadow: none; }
         .btn-outline:hover { background: rgba(212, 175, 55, 0.1); color: var(--gold-light); }
+        .btn-outline:disabled:hover { background: transparent; color: var(--gold-primary); }
         .btn-danger { background: var(--danger); color: white; }
+
+        /* --- STRUCTURE MAIN --- */
         main { flex: 1; width: 100%; }
         .section { display: none; opacity: 0; transition: opacity 0.4s ease; }
         .section.active { display: block; opacity: 1; }
         .container { max-width: 1400px; margin: 0 auto; padding: 2rem 1rem; }
+
+        /* --- HERO BANNERS --- */
         .hero {
             height: 35vh; min-height: 220px;
             display: flex; align-items: center; justify-content: center; text-align: center;
@@ -126,14 +145,20 @@
         .hero-content { position: relative; z-index: 1; max-width: 800px; padding: 0 20px; }
         .hero h1 { font-family: var(--font-heading), serif; font-size: clamp(1.8rem, 6vw, 2.8rem); color: var(--gold-primary); margin-bottom: 10px; text-shadow: 0 5px 15px rgba(0,0,0,0.8); }
         .hero p { font-size: 1rem; color: var(--text-main); font-weight: 300; }
+
+        /* --- CARTES & GRILLES --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .card { background: var(--bg-surface); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 12px; padding: 25px; transition: all 0.3s ease; }
         h2, h3 { font-family: var(--font-heading), serif; color: var(--gold-light); margin-bottom: 15px; }
+
+        /* --- RESTAURANT --- */
         .menu-list { display: flex; flex-direction: column; gap: 15px; }
         .menu-item { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 12px; gap: 15px; flex-wrap: wrap; }
         .menu-item-info h4 { font-family: var(--font-heading), serif; font-size: 1.1rem; color: var(--gold-primary); }
         .menu-item-info p { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; font-style: italic; }
         .menu-price { font-family: var(--font-heading), serif; font-size: 1.2rem; color: #fff; font-weight: 700; white-space: nowrap; }
+
+        /* --- SÉLECTEUR DE PLATS (panneau commande) --- */
         .dish-picker { display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; padding-right: 4px; margin-bottom: 5px; }
         .dish-pick-card {
             display: flex; justify-content: space-between; align-items: center; gap: 10px;
@@ -152,9 +177,12 @@
             cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; transition: all 0.2s ease;
         }
         .qty-btn:hover { background: var(--gold-primary); color: #000; }
+        .qty-btn:active { transform: scale(0.92); }
         .qty-value { min-width: 18px; text-align: center; font-family: var(--font-heading), serif; font-size: 1.05rem; color: #fff; }
         .order-summary { background: rgba(212, 175, 55, 0.08); border: 1px dashed var(--gold-dark); border-radius: 8px; padding: 12px 14px; margin: 15px 0; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; }
         .order-summary.empty { color: var(--text-muted); font-style: italic; justify-content: center; }
+
+        /* --- CASINO TABLES --- */
         .casino-table {
             background: radial-gradient(circle at center, #0f3d24 0%, #061c10 100%);
             border: 6px solid #2a1610; border-radius: 20px; padding: 30px 20px;
@@ -168,6 +196,8 @@
             box-shadow: 2px 4px 10px rgba(0,0,0,0.5); margin: 0 4px;
         }
         .playing-card.red { color: #d63031; }
+
+        /* --- FORMS & MODALS --- */
         .form-group { margin-bottom: 15px; text-align: left; }
         .form-group label { display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
         .form-group input, .form-group select, .form-group textarea {
@@ -176,6 +206,7 @@
             color: #fff; font-family: var(--font-body), sans-serif; font-size: 0.95rem;
         }
         .form-group input:focus, .form-group select:focus { border-color: var(--gold-primary); outline: none; }
+
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
@@ -186,6 +217,8 @@
             padding: 30px; border-radius: 12px; width: 100%; max-width: 420px;
             position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.6);
         }
+
+        /* --- ADMIN DASHBOARD --- */
         .admin-row {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0,0,0,0.4); padding: 12px 15px; border-radius: 6px; margin-bottom: 8px;
@@ -194,7 +227,10 @@
         .badge { padding: 3px 8px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
         .badge-employe { background: rgba(46, 213, 115, 0.2); color: var(--success); border: 1px solid var(--success); }
         .badge-vip { background: rgba(212, 175, 55, 0.2); color: var(--gold-light); border: 1px solid var(--gold-primary); }
+
         footer { text-align: center; padding: 1.5rem; border-top: 1px solid var(--glass-border); font-size: 0.8rem; color: var(--text-muted); }
+
+        /* --- NOTIFICATIONS TOAST --- */
         #toast-container {
             position: fixed; bottom: 20px; right: 20px; z-index: 3000;
             display: flex; flex-direction: column; gap: 10px; max-width: calc(100% - 40px); width: 320px;
@@ -211,6 +247,8 @@
         .toast.leaving { animation: toast-out 0.25s ease forwards; }
         @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes toast-out { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(10px); } }
+
+        /* --- RESPONSIVE : petits écrans --- */
         @media (max-width: 480px) {
             header { padding: 0.75rem 1rem; }
             .container { padding: 1.5rem 0.75rem; }
@@ -224,6 +262,7 @@
     </style>
 </head>
 <body>
+
     <header>
         <div class="logo-container">
             <div class="logo">AU FIL DU TEMPS</div>
@@ -243,6 +282,7 @@
             <button type="button" class="btn btn-danger" onclick="logout()" style="padding: 6px 12px; font-size: 0.75rem;">Quitter</button>
         </div>
     </header>
+
     <main>
         <!-- SECTION RESTAURANT -->
         <section id="restaurant" class="section active">
@@ -252,12 +292,14 @@
                     <p>Découvrez une carte raffinée, pensée par nos chefs étoilés.</p>
                 </div>
             </div>
+
             <div class="container">
                 <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
                     <div class="card">
                         <h2 style="text-align: center; margin-bottom: 20px;">Notre Menu Signature</h2>
                         <div class="menu-list" id="menu-grid"></div>
                     </div>
+
                     <div class="card" style="height: fit-content; border-color: var(--gold-primary);">
                         <h3 style="text-align: center;">Réserver / Commander</h3>
                         <form id="order-form" onsubmit="submitOrder(event)" style="margin-top: 15px;">
@@ -281,6 +323,7 @@
                 </div>
             </div>
         </section>
+
         <!-- SECTION CLUB -->
         <section id="club" class="section">
             <div class="hero" style="background-image: url('https://images.unsplash.com/photo-1566737236500-c8ac43014a67?auto=format&fit=crop&w=1920&q=80');">
@@ -289,6 +332,7 @@
                     <p>La référence nocturne de la ville.</p>
                 </div>
             </div>
+
             <div class="container">
                 <div class="grid">
                     <div class="card" style="text-align: center; padding: 40px 20px;">
@@ -297,6 +341,7 @@
                         <h3 style="color: #fff; margin-bottom: 15px;">Entrée Libre</h3>
                         <button type="button" class="btn btn-outline" onclick="enterClubDancefloor()" style="width:100%;">Rejoindre la piste</button>
                     </div>
+
                     <div class="card" style="text-align: center; padding: 40px 20px; background: linear-gradient(145deg, rgba(30,25,15,0.9), rgba(15,12,5,0.9)); border: 1px solid var(--gold-primary);">
                         <h2>L'Espace Privilège</h2>
                         <span class="badge badge-vip" style="display:inline-block; margin-bottom: 15px;">1500 Jetons / 1000 €</span>
@@ -306,6 +351,7 @@
                 </div>
             </div>
         </section>
+
         <!-- SECTION CASINO -->
         <section id="casino" class="section">
             <div class="hero" style="background-image: url('https://images.unsplash.com/photo-1596838132731-3301c3fd4317?auto=format&fit=crop&w=1920&q=80');">
@@ -314,7 +360,9 @@
                     <p>Tentez votre chance sur nos tables prestigieuses.</p>
                 </div>
             </div>
+
             <div class="container">
+                <!-- Panneau Contrôle Audio Casino -->
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px;">
                     <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-primary); padding: 10px 20px; border-radius: 8px; display: inline-flex; align-items: center; gap: 12px;">
                         <span style="font-size: 1.3rem;" aria-hidden="true">🏦</span>
@@ -323,17 +371,21 @@
                             <div style="font-size: 1.2rem; font-family: var(--font-heading), serif; color: #fff;"><span id="user-points">0</span> Jetons</div>
                         </div>
                     </div>
+
                     <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); padding: 10px 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 1.1rem;" id="audio-icon" aria-hidden="true">🎵</span>
                         <div style="font-size: 0.85rem; font-weight: 500;">Ambiance Casino</div>
                         <button type="button" class="btn btn-outline" id="audio-toggle-btn" onclick="toggleCasinoAudio()" style="padding: 5px 12px; font-size: 0.75rem;">Activer Musique</button>
                     </div>
                 </div>
+
+                <!-- CLASSEMENT DES JOUEURS (COMPÉTITION JETONS) -->
                 <div class="card" style="margin-bottom: 25px; border-top: 4px solid var(--gold-primary);">
                     <h3 style="text-align:center;">🏆 Classement des Joueurs</h3>
-                    <p style="color: var(--text-muted); font-size: 0.8rem; text-align:center; margin-bottom: 15px;">Les membres avec le plus de jetons synchronisés en direct.</p>
+                    <p style="color: var(--text-muted); font-size: 0.8rem; text-align:center; margin-bottom: 15px;">Les membres avec le plus de jetons sur cet appareil.</p>
                     <div id="leaderboard-list" style="display:flex; flex-direction:column; gap:8px;"></div>
                 </div>
+
                 <div id="casino-lobby" class="casino-view" style="display:block;">
                     <div class="grid">
                         <div class="card" style="text-align: center;">
@@ -363,6 +415,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- JEU BLACKJACK -->
                 <div id="game-blackjack" class="casino-view" style="display:none;">
                     <button type="button" class="btn-outline" onclick="backToLobby()" style="padding: 6px 12px; margin-bottom: 15px; border-radius:4px; color:#fff; cursor:pointer;">⬅ Quitter la table</button>
@@ -372,11 +425,13 @@
                             <label for="bj-bet" class="sr-only">Mise</label>
                             <input type="number" id="bj-bet" value="100" min="100" step="1" placeholder="Mise (Min 100)" style="text-align:center;">
                         </div>
+
                         <div style="min-height: 200px; display:flex; flex-direction:column; justify-content:center;">
                             <div id="bj-dealer-info" style="color: #fff; font-size: 0.9rem; margin-bottom: 10px; font-weight: bold;" aria-live="polite"></div>
                             <div id="bj-player-cards" style="display:flex; justify-content:center; flex-wrap: wrap; gap: 8px; margin-bottom: 15px;"></div>
                             <p id="bj-status" style="font-size: 1rem; color: var(--gold-light);" aria-live="polite"></p>
                         </div>
+
                         <div style="max-width: 250px; margin: 0 auto;">
                             <button type="button" class="btn" id="bj-start-btn" onclick="startBlackjack()" style="width:100%;">Distribuer</button>
                             <div id="bj-actions" style="display: none; gap: 10px; margin-top: 10px;">
@@ -386,6 +441,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- MACHINE A SOUS -->
                 <div id="game-slots" class="casino-view" style="display:none;">
                     <button type="button" class="btn-outline" onclick="backToLobby()" style="padding: 6px 12px; margin-bottom: 15px; border-radius:4px; color:#fff; cursor:pointer;">⬅ Quitter</button>
@@ -404,6 +460,7 @@
                         <button type="button" class="btn" id="slot-play-btn" onclick="playSlots()" style="width:100%;">Spin</button>
                     </div>
                 </div>
+
                 <!-- JEU ROULETTE -->
                 <div id="game-roulette" class="casino-view" style="display:none;">
                     <button type="button" class="btn-outline" onclick="backToLobby()" style="padding: 6px 12px; margin-bottom: 15px; border-radius:4px; color:#fff; cursor:pointer;">⬅ Quitter</button>
@@ -413,24 +470,29 @@
                             <label for="roulette-bet" class="sr-only">Mise</label>
                             <input type="number" id="roulette-bet" value="100" min="100" step="1" placeholder="Mise" style="text-align:center;">
                         </div>
+
                         <div id="roulette-wheel" style="font-size: 3rem; margin: 20px 0; color: var(--gold-primary);" aria-hidden="true">🎡</div>
                         <p id="roulette-status" style="margin-bottom: 15px; font-weight: bold; color: var(--gold-light);" aria-live="polite">Faites vos jeux</p>
+
                         <div style="display: flex; gap: 10px; justify-content: center;">
                             <button type="button" class="btn" id="roulette-rouge-btn" onclick="playRoulette('Rouge')" style="background: #e74c3c; color:white; border:none; flex:1;">Rouge (x2)</button>
                             <button type="button" class="btn" id="roulette-noir-btn" onclick="playRoulette('Noir')" style="background: #2c3e50; color:white; border:none; flex:1;">Noir (x2)</button>
                         </div>
                     </div>
                 </div>
+
                 <!-- JEU DU DÉ -->
                 <div id="game-dice" class="casino-view" style="display:none;">
                     <button type="button" class="btn-outline" onclick="backToLobby()" style="padding: 6px 12px; margin-bottom: 15px; border-radius:4px; color:#fff; cursor:pointer;">⬅ Quitter</button>
                     <div class="casino-table" style="max-width: 500px; margin: 0 auto;">
                         <h2 style="color: rgba(255,255,255,0.8); font-size: 1.2rem;">JEU DU DÉ 🎲</h2>
                         <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">Probabilité : 16.66% | Gain : Mise x5</p>
+
                         <div class="form-group" style="max-width: 180px; margin: 10px auto;">
                             <label for="dice-bet" style="text-align:center; color: var(--gold-light);">Mise (Min 150)</label>
                             <input type="number" id="dice-bet" value="150" min="150" step="1" style="text-align:center;">
                         </div>
+
                         <div class="form-group" style="max-width: 180px; margin: 10px auto;">
                             <label for="dice-choice" style="text-align:center; color: var(--gold-light);">Numéro (1 à 6)</label>
                             <select id="dice-choice" style="text-align:center;">
@@ -442,18 +504,24 @@
                                 <option value="6">6</option>
                             </select>
                         </div>
+
                         <div id="dice-result" style="font-size: 3rem; margin: 15px 0; color: var(--gold-primary);" aria-hidden="true">❓</div>
                         <p id="dice-status" style="margin-bottom: 15px; font-weight: bold; color: var(--gold-light);" aria-live="polite">Prêt à lancer</p>
+
                         <button type="button" class="btn" id="dice-play-btn" onclick="playDice()" style="width:180px;">Lancer le dé</button>
                     </div>
                 </div>
-                <!-- SALON MULTIJOUEUR POKER -->
+
+                <!-- SALON MULTIJOUEUR POKER (2 à 8 joueurs) -->
                 <div id="game-poker" class="casino-view" style="display:none;">
                     <button type="button" class="btn-outline" onclick="backToLobby()" style="padding: 6px 12px; margin-bottom: 15px; border-radius:4px; color:#fff; cursor:pointer;">⬅ Quitter le salon</button>
+
                     <div class="casino-table" style="max-width: 700px; margin: 0 auto;">
                         <h2 style="color: var(--gold-light); font-size: 1.3rem;">SALON PRIVÉ POKER (2-8 Joueurs)</h2>
                         <p id="poker-room-status" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;" aria-live="polite">En attente de joueurs...</p>
-                        <p style="color: var(--text-muted); font-size: 0.7rem; margin-bottom: 15px; font-style: italic;">✨ Ce salon est synchronisé en temps réel via Firebase.</p>
+                        <p style="color: var(--text-muted); font-size: 0.7rem; margin-bottom: 15px; font-style: italic;">⚠ Ce salon utilise le stockage local du navigateur : il n'est visible que sur cet appareil.</p>
+
+                        <!-- Configuration de table si non démarré -->
                         <div id="poker-setup" style="margin-bottom: 20px;">
                             <div class="form-group" style="max-width: 220px; margin: 0 auto 15px auto;">
                                 <label for="poker-buyin" style="color:var(--gold-light); text-align:center;">Mise d'entrée (Buy-in)</label>
@@ -461,24 +529,30 @@
                             </div>
                             <button type="button" class="btn" onclick="createOrJoinPokerTable()">S'asseoir à la table</button>
                         </div>
+
+                        <!-- Plateau de jeu actif -->
                         <div id="poker-board" style="display:none;">
                             <div style="background: rgba(0,0,0,0.6); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--gold-primary);">
                                 <div style="font-size: 0.8rem; text-transform: uppercase; color: var(--gold-primary);">Pot Commun</div>
                                 <div id="poker-pot" style="font-size: 1.5rem; font-family: var(--font-heading), serif; color: #fff;">0 Jetons</div>
                             </div>
+
                             <div style="margin-bottom: 15px;">
                                 <span style="font-size: 0.8rem; color: var(--text-muted);">Joueurs à la table (<span id="poker-players-count">0</span>/8) :</span>
                                 <div id="poker-seats-list" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px;"></div>
                             </div>
+
                             <div id="poker-actions" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px; display: none;">
                                 <button type="button" class="btn" onclick="pokerAction('suivre')" style="background: var(--success); color: #fff;">Suivre / Parler</button>
                                 <button type="button" class="btn" onclick="pokerAction('relancer')" style="background: var(--gold-primary); color: #000;">Relancer (+100)</button>
                                 <button type="button" class="btn" onclick="pokerAction('passer')" style="background: var(--danger); color: #fff;">Se Coucher</button>
                             </div>
+
                             <button type="button" id="poker-start-btn" class="btn" onclick="startPokerHand()" style="margin-top: 10px; display:none;">Lancer la manche</button>
                         </div>
                     </div>
                 </div>
+
                 <div class="grid" style="margin-top: 30px;">
                     <div class="card">
                         <h3>🔴 Mises en Direct des Joueurs</h3>
@@ -491,25 +565,30 @@
                 </div>
             </div>
         </section>
+
         <!-- SECTION EMPLOYE -->
         <section id="employe" class="section">
             <div class="container">
                 <h1 style="font-family: var(--font-heading), serif; color: var(--gold-primary); margin-bottom: 25px; text-align: center; font-size: 2rem;">Administration du Complexe</h1>
-                <p style="color: var(--text-muted); font-size: 0.75rem; text-align:center; margin-top:-15px; margin-bottom: 25px; font-style: italic;">✨ Synchronisé en direct via Firebase.</p>
+                <p style="color: var(--text-muted); font-size: 0.75rem; text-align:center; margin-top:-15px; margin-bottom: 25px; font-style: italic;">⚠ Ces données proviennent du stockage local de cet appareil : un autre membre du staff, sur un autre appareil, ne verra pas la même liste.</p>
+
                 <div class="grid">
                     <div class="card" style="border-top: 4px solid var(--success);">
                         <h3>Commandes Cuisine</h3>
                         <div id="admin-orders-list" style="max-height: 250px; overflow-y: auto; margin-top: 10px;"></div>
                     </div>
+
                     <div class="card" style="border-top: 4px solid var(--gold-primary);">
                         <h3>Demandes VIP</h3>
                         <div id="admin-vip-list" style="max-height: 250px; overflow-y: auto; margin-top: 10px;"></div>
                     </div>
                 </div>
+
                 <div class="card" style="margin-top: 20px; border-top: 4px solid var(--text-muted);">
                     <h3>Registre des Clients & Employés</h3>
                     <div id="admin-users-list" style="max-height: 300px; overflow-y: auto; margin-top: 10px;"></div>
                 </div>
+
                 <div class="grid" style="margin-top: 20px;">
                     <div class="card">
                         <h3>Outil : Gestion du Menu</h3>
@@ -530,6 +609,8 @@
                             <button type="submit" class="btn" style="width: 100%;">Ajouter à la carte</button>
                         </form>
                     </div>
+
+                    <!-- OUTIL GESTION JETONS (CRÉDITER / RETIRER) -->
                     <div class="card">
                         <h3>Outil : Gérer les Jetons</h3>
                         <form onsubmit="manageCasinoPoints(event)">
@@ -553,18 +634,21 @@
             </div>
         </section>
     </main>
+
     <!-- MODALS -->
     <div id="vipModal" class="modal" onclick="handleOverlayClick(event, 'vipModal')">
         <div class="modal-content" style="text-align: center;" role="dialog" aria-modal="true" aria-labelledby="vip-modal-title">
             <button type="button" onclick="closeModal('vipModal')" aria-label="Fermer" style="position:absolute; top:12px; right:15px; background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
             <h2 id="vip-modal-title" style="margin-bottom: 15px;">Accès Privilège VIP</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Sélectionnez votre méthode de paiement.</p>
+
             <div style="display: flex; flex-direction: column; gap: 12px;">
                 <button type="button" class="btn" onclick="bookVipWithTokens()" style="padding: 12px;">Régler 1500 Jetons</button>
                 <button type="button" class="btn btn-outline" onclick="bookVipOnSite()" style="padding: 12px;">Régler 1000 € sur place</button>
             </div>
         </div>
     </div>
+
     <div id="loginModal" class="modal" onclick="handleOverlayClick(event, 'loginModal')">
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
             <button type="button" onclick="closeModal('loginModal')" aria-label="Fermer" style="position:absolute; top:12px; right:15px; background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
@@ -587,6 +671,7 @@
             </form>
         </div>
     </div>
+
     <div id="registerModal" class="modal" onclick="handleOverlayClick(event, 'registerModal')">
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="register-modal-title">
             <button type="button" onclick="closeModal('registerModal')" aria-label="Fermer" style="position:absolute; top:12px; right:15px; background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
@@ -613,6 +698,7 @@
             </form>
         </div>
     </div>
+
     <div id="editDishModal" class="modal" onclick="handleOverlayClick(event, 'editDishModal')">
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="edit-dish-modal-title">
             <button type="button" onclick="closeModal('editDishModal')" aria-label="Fermer" style="position:absolute; top:12px; right:15px; background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
@@ -635,30 +721,27 @@
             </form>
         </div>
     </div>
+
     <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
+
     <footer>
-        <p>&copy; 2026 Au Fil du Temps | Complexe de Luxe & Divertissement. Propulsé par Firebase.</p>
+        <p>&copy; 2026 Au Fil du Temps | Complexe de Luxe & Divertissement. Compatible multiplateforme.</p>
     </footer>
 
     <script>
         'use strict';
 
         /* ============================================================
-           CONFIGURATION FIREBASE
+           CONFIGURATION
            ============================================================ */
-        const firebaseConfig = {
-            apiKey: "VOTRE_API_KEY",
-            authDomain: "votre-projet.firebaseapp.com",
-            projectId: "votre-projet-id",
-            storageBucket: "votre-projet.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
         const STORAGE_KEYS = {
+            users: 'aft_users',
+            orders: 'aft_orders',
+            vipRequests: 'aft_vip_requests',
+            history: 'aft_history',
+            liveBets: 'aft_live_bets',
+            pokerTable: 'aft_poker_table',
+            menu: 'aft_menu',
             current: 'aft_current'
         };
 
@@ -672,18 +755,22 @@
             rouletteMultiplier: 2,
             vipPriceTokens: 1500,
             vipPriceCash: '1000 €',
-            vipDurationMs: 7 * 24 * 60 * 60 * 1000,
+            vipDurationMs: 7 * 24 * 60 * 60 * 1000, // 1 semaine
             pokerMinPlayers: 2,
             pokerMaxPlayers: 8,
             pokerRaiseAmount: 100,
             pokerBlind: 50
         };
 
+        /* ============================================================
+           UTILITAIRES : identifiants, échappement HTML, stockage sûr
+           ============================================================ */
         let idCounter = 0;
         function generateId() {
             idCounter += 1;
             return `${Date.now().toString(36)}-${idCounter}-${Math.random().toString(36).slice(2, 7)}`;
         }
+
         function escapeHtml(value) {
             const str = (value === null || value === undefined) ? '' : String(value);
             return str
@@ -693,22 +780,41 @@
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
         }
+
         function safeParse(raw, fallback) {
             if (raw === null || raw === undefined) return fallback;
             try {
                 const parsed = JSON.parse(raw);
                 return parsed === null || parsed === undefined ? fallback : parsed;
             } catch (e) {
+                console.warn('Donnée locale corrompue, valeur par défaut utilisée.', e);
                 return fallback;
             }
         }
+
+        function loadArray(key) {
+            const data = safeParse(localStorage.getItem(key), []);
+            return Array.isArray(data) ? data : [];
+        }
+
         function loadObject(key, fallback) {
             const data = safeParse(localStorage.getItem(key), fallback);
             return (data && typeof data === 'object' && !Array.isArray(data)) ? data : fallback;
         }
 
+        function persist(key, value) {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+                return true;
+            } catch (e) {
+                console.error('Échec de sauvegarde locale', e);
+                showToast("Le stockage local est plein ou indisponible : la dernière action n'a pas pu être sauvegardée.", 'error');
+                return false;
+            }
+        }
+
         /* ============================================================
-           NOTIFICATIONS TOAST
+           NOTIFICATIONS (remplace les alert() bloquants)
            ============================================================ */
         function showToast(message, type) {
             const container = document.getElementById('toast-container');
@@ -717,99 +823,46 @@
             toast.className = 'toast' + (type ? ' ' + type : '');
             toast.textContent = message;
             container.appendChild(toast);
+            const lifetime = 3800;
             setTimeout(() => {
                 toast.classList.add('leaving');
                 setTimeout(() => toast.remove(), 250);
-            }, 3800);
+            }, lifetime);
         }
 
         /* ============================================================
-           ÉTAT DE L'APPLICATION & SYNCHRONISATION FIREBASE
+           ÉTAT DE L'APPLICATION
            ============================================================ */
-        let users = [];
-        let orders = [];
-        let vipRequests = [];
-        let casinoHistory = [];
-        let liveBets = [];
-        let pokerTable = { players: [], pot: 0, status: 'attente' };
+        let users = loadArray(STORAGE_KEYS.users);
+        let orders = loadArray(STORAGE_KEYS.orders);
+        let vipRequests = loadArray(STORAGE_KEYS.vipRequests);
+        let casinoHistory = loadArray(STORAGE_KEYS.history);
+        let liveBets = loadArray(STORAGE_KEYS.liveBets);
+        let pokerTable = loadObject(STORAGE_KEYS.pokerTable, { players: [], pot: 0, status: 'attente' });
         let currentUser = loadObject(STORAGE_KEYS.current, null);
-        let menuItems = [];
+        let menuItems = loadArray(STORAGE_KEYS.menu);
 
-        function initFirebaseListeners() {
-            // Écouteurs en temps réel Firestore
-            db.collection('users').onSnapshot(snapshot => {
-                users = [];
-                snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
-                migrateLegacyData();
-                checkVipExpiry();
-                checkAuthUI();
-                if (document.getElementById('employe').classList.contains('active')) renderAdminUsers();
-                renderLeaderboard();
-            });
-
-            db.collection('orders').onSnapshot(snapshot => {
-                orders = [];
-                snapshot.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
-                renderAdminOrders();
-            });
-
-            db.collection('vipRequests').onSnapshot(snapshot => {
-                vipRequests = [];
-                snapshot.forEach(doc => vipRequests.push({ id: doc.id, ...doc.data() }));
-                renderAdminVipRequests();
-            });
-
-            db.collection('menu').onSnapshot(snapshot => {
-                menuItems = [];
-                snapshot.forEach(doc => menuItems.push({ id: doc.id, ...doc.data() }));
-                if (menuItems.length === 0) {
-                    const defaultMenu = [
-                        { id: generateId(), name: "Filet de Bœuf Rossini", desc: "Cuisson parfaite, sauce truffée.", price: "45 $" },
-                        { id: generateId(), name: "Pavé de Saumon Sauvage", desc: "Accompagné de ses légumes de saison.", price: "38 $" },
-                        { id: generateId(), name: "Fondant au Chocolat Noir", desc: "Cœur coulant, glace vanille artisanale.", price: "16 $" }
-                    ];
-                    defaultMenu.forEach(item => db.collection('menu').doc(item.id).set(item));
-                } else {
-                    renderMenu();
-                    if (document.getElementById('employe').classList.contains('active')) renderAdminMenu();
-                }
-            });
-
-            db.collection('history').onSnapshot(snapshot => {
-                casinoHistory = [];
-                snapshot.forEach(doc => casinoHistory.push({ id: doc.id, ...doc.data() }));
-                renderCasinoHistory();
-            });
-
-            db.collection('liveBets').onSnapshot(snapshot => {
-                liveBets = [];
-                snapshot.forEach(doc => liveBets.push({ id: doc.id, ...doc.data() }));
-                renderLiveBets();
-            });
-
-            db.doc('rooms/pokerTable').onSnapshot(doc => {
-                if (doc.exists) {
-                    pokerTable = doc.data();
-                } else {
-                    pokerTable = { players: [], pot: 0, status: 'attente' };
-                    db.doc('rooms/pokerTable').set(pokerTable);
-                }
-                renderPokerTable();
-            });
+        if (menuItems.length === 0) {
+            menuItems = [
+                { id: generateId(), name: "Filet de Bœuf Rossini", desc: "Cuisson parfaite, sauce truffée.", price: "45 $" },
+                { id: generateId(), name: "Pavé de Saumon Sauvage", desc: "Accompagné de ses légumes de saison.", price: "38 $" },
+                { id: generateId(), name: "Fondant au Chocolat Noir", desc: "Cœur coulant, glace vanille artisanale.", price: "16 $" }
+            ];
         }
 
+        // Migration : garantit un identifiant unique pour toute donnée créée avec une version antérieure du site
         function migrateLegacyData() {
             let usersChanged = false;
-            users.forEach(u => { 
-                if (u && !u.id) { 
-                    u.id = generateId(); 
-                    db.collection('users').doc(u.id).set(u);
-                    usersChanged = true; 
-                } 
-            });
+            users.forEach(u => { if (u && !u.id) { u.id = generateId(); usersChanged = true; } });
+            if (usersChanged) persist(STORAGE_KEYS.users, users);
+
+            let menuChanged = false;
+            menuItems.forEach(item => { if (item && !item.id) { item.id = generateId(); menuChanged = true; } });
+            if (menuChanged) persist(STORAGE_KEYS.menu, menuItems);
+
             if (currentUser && !currentUser.id) {
                 const match = users.find(u => u && u.nom === currentUser.nom && u.prenom === currentUser.prenom);
-                if (match) { currentUser = match; localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(currentUser)); }
+                if (match) { currentUser = match; persist(STORAGE_KEYS.current, currentUser); }
             }
         }
 
@@ -821,30 +874,38 @@
         }
         function findDishById(id) { return menuItems.find(item => item && item.id === id); }
 
+        /* ============================================================
+           VIP : octroi et expiration (durée 1 semaine)
+           ============================================================ */
         function grantVip(user) {
             user.isVip = true;
             user.vipExpiresAt = Date.now() + GAME_RULES.vipDurationMs;
         }
+
         function revokeVip(user) {
             user.isVip = false;
             delete user.vipExpiresAt;
         }
+
+        // Repasse automatiquement les VIP expirés en non-VIP. Retourne true si des données ont changé.
         function checkVipExpiry() {
             let changed = false;
             users.forEach(u => {
                 if (u && u.isVip && u.vipExpiresAt && Date.now() > u.vipExpiresAt) {
                     revokeVip(u);
-                    db.collection('users').doc(u.id).set(u);
                     changed = true;
                 }
             });
+            if (changed) persist(STORAGE_KEYS.users, users);
+
             if (currentUser && currentUser.isVip && currentUser.vipExpiresAt && Date.now() > currentUser.vipExpiresAt) {
                 revokeVip(currentUser);
-                localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(currentUser));
+                persist(STORAGE_KEYS.current, currentUser);
                 changed = true;
             }
             return changed;
         }
+
         function formatVipRemaining(user) {
             if (!user.vipExpiresAt) return '';
             const msLeft = user.vipExpiresAt - Date.now();
@@ -854,11 +915,58 @@
         }
 
         /* ============================================================
-           SYSTÈME AUDIO (Web Audio API)
+           MUSIQUE D'AMBIANCE (vidéo YouTube libre de droits en fond)
+           ============================================================ */
+        // Piste utilisée : "Piano Bar" (Francesco Biondi) — jazz piano solo, ambiance cocktail/salon, No Copyright Strike Music
+        const AMBIENT_YT_VIDEO_ID = '6lr511QQW1g';
+        let isCasinoAudioPlaying = false;
+        let ambientPlayerReady = false;
+
+        function ensureAmbientPlayer() {
+            if (document.getElementById('ambient-yt-player')) return;
+            const iframe = document.createElement('iframe');
+            iframe.id = 'ambient-yt-player';
+            iframe.src = `https://www.youtube.com/embed/${AMBIENT_YT_VIDEO_ID}?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=${AMBIENT_YT_VIDEO_ID}`;
+            iframe.allow = 'autoplay';
+            iframe.style.cssText = 'position:fixed; bottom:0; right:0; width:1px; height:1px; opacity:0; pointer-events:none; border:0;';
+            iframe.setAttribute('aria-hidden', 'true');
+            iframe.tabIndex = -1;
+            document.body.appendChild(iframe);
+            iframe.addEventListener('load', () => { ambientPlayerReady = true; });
+        }
+
+        function postToAmbientPlayer(func) {
+            const iframe = document.getElementById('ambient-yt-player');
+            if (!iframe || !iframe.contentWindow) return;
+            iframe.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args: [] }), 'https://www.youtube.com');
+        }
+
+        function toggleCasinoAudio() {
+            isCasinoAudioPlaying = !isCasinoAudioPlaying;
+            const btn = document.getElementById('audio-toggle-btn');
+            const icon = document.getElementById('audio-icon');
+
+            if (isCasinoAudioPlaying) {
+                btn.innerText = "Couper Musique";
+                btn.style.borderColor = "var(--success)";
+                btn.style.color = "var(--success)";
+                icon.innerText = "🔊";
+                ensureAmbientPlayer();
+                // Laisse le temps à l'iframe de charger avant d'envoyer la commande de lecture
+                setTimeout(() => postToAmbientPlayer('playVideo'), ambientPlayerReady ? 0 : 700);
+            } else {
+                btn.innerText = "Activer Musique";
+                btn.style.borderColor = "var(--gold-primary)";
+                btn.style.color = "var(--gold-primary)";
+                icon.innerText = "🎵";
+                postToAmbientPlayer('pauseVideo');
+            }
+        }
+
+        /* ============================================================
+           EFFETS SONORES DES JEUX (Web Audio API — synthèse, pas de fichier externe)
            ============================================================ */
         let audioCtx = null;
-        let isCasinoAudioPlaying = false;
-        let casinoAmbienceInterval = null;
         function initAudioContext() {
             if (!audioCtx) {
                 const AudioCtor = window.AudioContext || window.webkitAudioContext;
@@ -867,55 +975,7 @@
             }
             if (audioCtx.state === 'suspended') { audioCtx.resume(); }
         }
-        function toggleCasinoAudio() {
-            initAudioContext();
-            isCasinoAudioPlaying = !isCasinoAudioPlaying;
-            const btn = document.getElementById('audio-toggle-btn');
-            const icon = document.getElementById('audio-icon');
-            if (isCasinoAudioPlaying) {
-                btn.innerText = "Couper Musique";
-                btn.style.borderColor = "var(--success)";
-                btn.style.color = "var(--success)";
-                icon.innerText = "🔊";
-                startCasinoAmbience();
-            } else {
-                btn.innerText = "Activer Musique";
-                btn.style.borderColor = "var(--gold-primary)";
-                btn.style.color = "var(--gold-primary)";
-                icon.innerText = "🎵";
-                stopCasinoAmbience();
-            }
-        }
-        function startCasinoAmbience() {
-            if (casinoAmbienceInterval) clearInterval(casinoAmbienceInterval);
-            const chords = [261.63, 329.63, 392.00, 523.25, 440.00, 349.23];
-            playAmbientChord();
-            casinoAmbienceInterval = setInterval(() => {
-                if (isCasinoAudioPlaying) {
-                    const freq = chords[Math.floor(Math.random() * chords.length)];
-                    playAmbientChord(freq);
-                }
-            }, 4500);
-        }
-        function stopCasinoAmbience() {
-            if (casinoAmbienceInterval) { clearInterval(casinoAmbienceInterval); casinoAmbienceInterval = null; }
-        }
-        function playAmbientChord(freq = 261.63) {
-            if (!audioCtx || !isCasinoAudioPlaying) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.03, audioCtx.currentTime + 1.5);
-                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 4);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 4.2);
-            } catch (e) {}
-        }
+
         function playSfx(type) {
             initAudioContext();
             if (!audioCtx) return;
@@ -925,6 +985,7 @@
                 const gain = audioCtx.createGain();
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
+
                 if (type === 'card') {
                     osc.type = 'triangle';
                     osc.frequency.setValueAtTime(600, now);
@@ -973,14 +1034,25 @@
                     gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
                     osc.start(now); osc.stop(now + 0.13);
                 }
-            } catch (e) {}
+            } catch (e) { /* audio non bloquant */ }
         }
 
         /* ============================================================
            INITIALISATION / NAVIGATION
            ============================================================ */
         function initApp() {
-            initFirebaseListeners();
+            migrateLegacyData();
+            checkVipExpiry();
+            renderMenu();
+            checkAuthUI();
+            renderAdminOrders();
+            renderAdminVipRequests();
+            renderAdminUsers();
+            renderAdminMenu();
+            renderCasinoHistory();
+            renderLiveBets();
+            renderPokerTable();
+            renderLeaderboard();
             setInterval(() => {
                 if (checkVipExpiry()) { checkAuthUI(); renderAdminUsers(); renderLeaderboard(); }
             }, 60000);
@@ -990,20 +1062,25 @@
                 }
             });
         }
+
         function switchTab(tabId) {
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
+
             document.querySelectorAll('nav a').forEach(l => {
                 if (l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabId)) { l.classList.add('active'); }
             });
+
             if (tabId === 'employe') { renderAdminOrders(); renderAdminVipRequests(); renderAdminUsers(); renderAdminMenu(); }
             if (tabId === 'casino') { backToLobby(); }
         }
+
         function enterClubDancefloor() {
             if (!currentUser) { showToast("Veuillez vous identifier pour entrer dans le club."); openModal('loginModal'); return; }
             showToast(`Bienvenue sur la piste de danse, ${currentUser.prenom} !`, 'success');
         }
+
         function openModal(id) {
             document.getElementById(id).style.display = 'flex';
             if (id === 'registerModal') document.getElementById('reg-error').style.display = 'none';
@@ -1021,6 +1098,7 @@
             if (!currentUser) { showToast("Veuillez vous identifier pour accéder au carré VIP."); openModal('loginModal'); return; }
             openModal('vipModal');
         }
+
         function bookVipWithTokens() {
             closeModal('vipModal');
             if (currentUser.employe || currentUser.points >= GAME_RULES.vipPriceTokens) {
@@ -1032,12 +1110,14 @@
                 showToast(`❌ Solde insuffisant (${GAME_RULES.vipPriceTokens} jetons requis).`, 'error');
             }
         }
+
         function bookVipOnSite() {
             closeModal('vipModal');
             const exist = vipRequests.find(v => v.nom.toLowerCase() === currentUser.nom.toLowerCase() && v.prenom.toLowerCase() === currentUser.prenom.toLowerCase());
             if (exist) { showToast("⚠️ Demande déjà en attente.", 'error'); return; }
-            const newReq = { nom: currentUser.nom, prenom: currentUser.prenom, montant: GAME_RULES.vipPriceCash, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
-            db.collection('vipRequests').add(newReq);
+            vipRequests.push({ id: generateId(), nom: currentUser.nom, prenom: currentUser.prenom, montant: GAME_RULES.vipPriceCash, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            persist(STORAGE_KEYS.vipRequests, vipRequests);
+            renderAdminVipRequests();
             showToast(`📝 Demande enregistrée. Présentez-vous à l'entrée avec ${GAME_RULES.vipPriceCash}.`, 'success');
         }
 
@@ -1049,6 +1129,7 @@
             document.getElementById(`game-${gameName}`).style.display = 'block';
             if (gameName === 'poker') renderPokerTable();
         }
+
         function backToLobby() {
             document.querySelectorAll('.casino-view').forEach(v => v.style.display = 'none');
             document.getElementById('casino-lobby').style.display = 'block';
@@ -1057,55 +1138,65 @@
         }
 
         /* ============================================================
-           AUTHENTIFICATION
+           AUTHENTIFICATION (350 Jetons offerts)
            ============================================================ */
         function handleRegister(e) {
             e.preventDefault();
             document.getElementById('reg-error').style.display = 'none';
+
             const nom = document.getElementById('reg-nom').value.trim();
             const prenom = document.getElementById('reg-prenom').value.trim();
             const pass = document.getElementById('reg-pass').value;
             const code = document.getElementById('reg-code').value;
+
             if (findUserByNomPrenom(nom, prenom)) {
                 document.getElementById('reg-error').style.display = 'block';
                 return;
             }
+
             const isEmploye = (code === "Jean Jack 123");
-            const userId = generateId();
-            const newUser = { id: userId, nom, prenom, pass, points: 350, employe: isEmploye, isVip: false };
-            
-            db.collection('users').doc(userId).set(newUser).then(() => {
-                currentUser = newUser;
-                localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(currentUser));
-                e.target.reset();
-                closeModal('registerModal');
-                checkAuthUI();
-                renderAdminUsers();
-                renderLeaderboard();
-                showToast(isEmploye ? "Compte Staff créé ! 350 jetons offerts." : "Bienvenue ! 350 jetons offerts.", 'success');
-            });
+            const newUser = { id: generateId(), nom, prenom, pass, points: 350, employe: isEmploye, isVip: false };
+            users.push(newUser);
+            persist(STORAGE_KEYS.users, users);
+
+            currentUser = newUser;
+            persist(STORAGE_KEYS.current, currentUser);
+
+            e.target.reset();
+            closeModal('registerModal');
+            checkAuthUI();
+            renderAdminUsers();
+            renderLeaderboard();
+            showToast(isEmploye ? "Compte Staff créé ! 350 jetons offerts." : "Bienvenue ! 350 jetons offerts.", 'success');
         }
+
         function handleLogin(e) {
             e.preventDefault();
             document.getElementById('login-error').style.display = 'none';
+
             const nom = document.getElementById('login-nom').value.trim();
             const prenom = document.getElementById('login-prenom').value.trim();
             const pass = document.getElementById('login-pass').value;
+
             const user = findUserByNomPrenom(nom, prenom);
             if (!user || user.pass !== pass) {
                 document.getElementById('login-error').style.display = 'block';
                 return;
             }
+
             currentUser = user;
-            localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(currentUser));
+            persist(STORAGE_KEYS.current, currentUser);
             e.target.reset();
             closeModal('loginModal');
             checkAuthUI();
         }
+
         function logout() { currentUser = null; localStorage.removeItem(STORAGE_KEYS.current); checkAuthUI(); switchTab('restaurant'); }
+
         function checkAuthUI() {
             const authPanel = document.getElementById('user-panel-auth');
             const loggedPanel = document.getElementById('user-panel-logged');
+
             if (currentUser) {
                 authPanel.style.display = 'none';
                 loggedPanel.style.display = 'flex';
@@ -1126,18 +1217,23 @@
            MENU RESTAURANT
            ============================================================ */
         let orderCart = {};
+
         function renderMenu() {
             const grid = document.getElementById('menu-grid');
             const picker = document.getElementById('order-plat-picker');
             grid.innerHTML = '';
             if (picker) picker.innerHTML = '';
+
+            // Nettoie le panier des plats qui n'existent plus
             Object.keys(orderCart).forEach(id => { if (!findDishById(id)) delete orderCart[id]; });
+
             if (menuItems.length === 0) {
                 grid.innerHTML = `<p style="color:var(--text-muted);">Le chef prépare la carte...</p>`;
                 if (picker) picker.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">Aucun plat disponible pour le moment.</p>`;
                 updateOrderSummary();
                 return;
             }
+
             menuItems.forEach(item => {
                 grid.innerHTML += `<div class="menu-item"><div class="menu-item-info"><h4>${escapeHtml(item.name)}</h4><p>${escapeHtml(item.desc)}</p></div><div class="menu-price">${escapeHtml(item.price)}</div></div>`;
                 if (picker) {
@@ -1150,39 +1246,47 @@
                                 <div class="dish-pick-price" style="margin-top:4px;">${escapeHtml(item.price)}</div>
                             </div>
                             <div class="qty-controls">
-                                <button type="button" class="qty-btn" aria-label="Retirer" onclick="changeDishQty('${item.id}', -1)">−</button>
+                                <button type="button" class="qty-btn" aria-label="Retirer un ${escapeHtml(item.name)}" onclick="changeDishQty('${item.id}', -1)">−</button>
                                 <span class="qty-value" id="qty-${item.id}">${qty}</span>
-                                <button type="button" class="qty-btn" aria-label="Ajouter" onclick="changeDishQty('${item.id}', 1)">+</button>
+                                <button type="button" class="qty-btn" aria-label="Ajouter un ${escapeHtml(item.name)}" onclick="changeDishQty('${item.id}', 1)">+</button>
                             </div>
                         </div>`;
                 }
             });
+
             updateOrderSummary();
         }
+
         function changeDishQty(id, delta) {
             const dish = findDishById(id);
             if (!dish) return;
             const newQty = Math.max(0, (orderCart[id] || 0) + delta);
             if (newQty === 0) { delete orderCart[id]; } else { orderCart[id] = newQty; }
+
             const qtyEl = document.getElementById(`qty-${id}`);
             if (qtyEl) qtyEl.textContent = newQty;
             const card = document.querySelector(`.dish-pick-card[data-dish-id="${id}"]`);
             if (card) card.classList.toggle('selected', newQty > 0);
+
             updateOrderSummary();
         }
+
         function parsePriceNumber(price) {
             const match = String(price).replace(',', '.').match(/[\d.]+/);
             return match ? parseFloat(match[0]) : null;
         }
+
         function updateOrderSummary() {
             const summary = document.getElementById('order-summary');
             if (!summary) return;
             const entries = Object.entries(orderCart).filter(([, qty]) => qty > 0);
+
             if (entries.length === 0) {
                 summary.classList.add('empty');
                 summary.innerHTML = "Aucun plat sélectionné";
                 return;
             }
+
             summary.classList.remove('empty');
             let total = 0;
             let totalKnown = true;
@@ -1193,11 +1297,14 @@
                 if (unit === null) { totalKnown = false; } else { total += unit * qty; }
                 return `<div style="display:flex; justify-content:space-between; width:100%;"><span>${qty}× ${escapeHtml(dish.name)}</span><span>${escapeHtml(dish.price)}</span></div>`;
             }).join('');
+
             const totalLine = totalKnown
                 ? `<div style="display:flex; justify-content:space-between; width:100%; margin-top:8px; padding-top:8px; border-top: 1px dashed var(--gold-dark); font-family: var(--font-heading), serif; color: var(--gold-light);"><span>Total</span><span>${total.toFixed(2).replace(/\.00$/, '')} $</span></div>`
                 : '';
+
             summary.innerHTML = `<div style="display:flex; flex-direction:column; gap:4px; width:100%;">${lines}${totalLine}</div>`;
         }
+
         function resetOrderCart() {
             orderCart = {};
             document.querySelectorAll('#order-plat-picker .dish-pick-card').forEach(card => {
@@ -1207,6 +1314,7 @@
             });
             updateOrderSummary();
         }
+
         function submitOrder(e) {
             e.preventDefault();
             const nom = document.getElementById('order-nom').value.trim();
@@ -1216,22 +1324,23 @@
                 const dish = findDishById(id);
                 return dish ? { name: dish.name, qty } : null;
             }).filter(Boolean);
+
             if (!nom || !prenom || items.length === 0) { showToast("Merci de renseigner votre identité et de choisir au moins un plat.", 'error'); return; }
-            
-            const newOrder = { nom, prenom, items, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
-            db.collection('orders').add(newOrder).then(() => {
-                showToast("Votre commande a été transmise au chef.", 'success');
-                e.target.reset();
-                resetOrderCart();
-                if (currentUser) {
-                    document.getElementById('order-nom').value = currentUser.nom;
-                    document.getElementById('order-prenom').value = currentUser.prenom;
-                }
-            });
+
+            orders.push({ id: generateId(), nom, prenom, items, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            persist(STORAGE_KEYS.orders, orders);
+            showToast("Votre commande a été transmise au chef.", 'success');
+            renderAdminOrders();
+            e.target.reset();
+            resetOrderCart();
+            if (currentUser) {
+                document.getElementById('order-nom').value = currentUser.nom;
+                document.getElementById('order-prenom').value = currentUser.prenom;
+            }
         }
 
         /* ============================================================
-           ADMINISTRATION & GESTION FIREBASE
+           ADMINISTRATION (Créditer / Retirer des points)
            ============================================================ */
         function renderAdminOrders() {
             const container = document.getElementById('admin-orders-list');
@@ -1248,7 +1357,7 @@
                 </div>`;
             }).join('');
         }
-        function completeOrder(id) { db.collection('orders').doc(id).delete(); }
+        function completeOrder(id) { orders = orders.filter(o => o.id !== id); persist(STORAGE_KEYS.orders, orders); renderAdminOrders(); }
 
         function renderAdminVipRequests() {
             const container = document.getElementById('admin-vip-list');
@@ -1263,13 +1372,18 @@
         function validateVipPayment(id) {
             const req = vipRequests.find(r => r.id === id);
             if (!req) return;
-            db.collection('vipRequests').doc(id).delete();
+            vipRequests = vipRequests.filter(r => r.id !== id);
+            persist(STORAGE_KEYS.vipRequests, vipRequests);
+
             const target = findUserByNomPrenom(req.nom, req.prenom);
             if (target) {
                 grantVip(target);
-                db.collection('users').doc(target.id).set(target);
-                if (currentUser && currentUser.id === target.id) { grantVip(currentUser); localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(currentUser)); checkAuthUI(); }
+                persist(STORAGE_KEYS.users, users);
+                if (currentUser && currentUser.id === target.id) { grantVip(currentUser); persist(STORAGE_KEYS.current, currentUser); checkAuthUI(); }
             }
+            renderAdminVipRequests();
+            renderAdminUsers();
+            renderLeaderboard();
             showToast("Paiement validé. Statut VIP accordé pour 1 semaine.", 'success');
         }
 
@@ -1287,21 +1401,31 @@
                         <span style="font-family: var(--font-heading), serif; color: var(--gold-light); font-size: 1.1rem;">${u.points || 0} pts</span>
                         <div style="display:flex; gap:5px; margin-top:4px;">
                             <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 6px; cursor:pointer;" onclick="toggleRole('${u.id}', 'employe')">${u.employe ? '- Staff' : '+ Staff'}</button>
-                            <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 6px; cursor:pointer;" onclick="toggleRole('${u.id}', 'isVip')">${u.isVip ? '- VIP' : '+ VIP'}</button>
+                            <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 6px; cursor:pointer;" onclick="toggleRole('${u.id}', 'isVip')">${u.isVip ? '- VIP' : '+ VIP (1 semaine)'}</button>
                             <button type="button" class="btn-danger" style="font-size:0.65rem; padding:3px 6px; border-radius:4px; border:none; cursor:pointer;" onclick="deleteUser('${u.id}')">Supprimer</button>
                         </div>
                     </div>
                 </div>`).join('');
         }
 
+        /* ============================================================
+           CLASSEMENT (LEADERBOARD) - compétition sur les jetons
+           ============================================================ */
         function renderLeaderboard() {
             const container = document.getElementById('leaderboard-list');
             if (!container) return;
-            const ranked = users.filter(u => u && u.nom && u.prenom).slice().sort((a, b) => (b.points || 0) - (a.points || 0)).slice(0, 5);
+
+            const ranked = users
+                .filter(u => u && u.nom && u.prenom)
+                .slice()
+                .sort((a, b) => (b.points || 0) - (a.points || 0))
+                .slice(0, 5);
+
             if (ranked.length === 0) {
                 container.innerHTML = `<p style="color:var(--text-muted); text-align:center;">Aucun membre pour le moment.</p>`;
                 return;
             }
+
             const medals = ['🥇', '🥈', '🥉'];
             container.innerHTML = ranked.map((u, i) => {
                 const isMe = currentUser && currentUser.id === u.id;
@@ -1321,31 +1445,41 @@
         function toggleRole(id, roleProp) {
             const target = findUserById(id);
             if (!target) return;
+
             if (roleProp === 'isVip') {
                 if (target.isVip) { revokeVip(target); } else { grantVip(target); }
             } else {
                 target[roleProp] = !target[roleProp];
             }
-            db.collection('users').doc(id).set(target);
+
+            persist(STORAGE_KEYS.users, users);
             if (currentUser && currentUser.id === target.id) {
                 currentUser.isVip = target.isVip;
                 currentUser.vipExpiresAt = target.vipExpiresAt;
                 currentUser[roleProp] = target[roleProp];
-                localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(currentUser));
+                persist(STORAGE_KEYS.current, currentUser);
                 checkAuthUI();
             }
+            renderAdminUsers();
+            renderLeaderboard();
         }
 
         function deleteUser(id) {
             const target = findUserById(id);
             if (!target) return;
             if (!window.confirm(`Supprimer définitivement ${target.prenom} ${target.nom} du registre ?`)) return;
-            db.collection('users').doc(id).delete();
+
+            users = users.filter(u => u && u.id !== id);
+            persist(STORAGE_KEYS.users, users);
+
             if (currentUser && currentUser.id === id) {
                 showToast("Votre compte a été supprimé par un membre du staff.", 'error');
                 logout();
             }
-            showToast(`${target.prenom} ${target.nom} a été supprimé(e).`, 'success');
+
+            renderAdminUsers();
+            renderLeaderboard();
+            showToast(`${target.prenom} ${target.nom} a été supprimé(e) du registre.`, 'success');
         }
 
         function addNewDish(e) {
@@ -1354,13 +1488,17 @@
             const desc = document.getElementById('new-dish-desc').value.trim();
             const price = document.getElementById('new-dish-price').value.trim();
             if (!name || !desc || !price) { showToast("Merci de remplir tous les champs du plat.", 'error'); return; }
-            const id = generateId();
-            db.collection('menu').doc(id).set({ id, name, desc, price }).then(() => {
-                e.target.reset();
-                showToast("Menu mis à jour !", 'success');
-            });
+            menuItems.push({ id: generateId(), name, desc, price });
+            persist(STORAGE_KEYS.menu, menuItems);
+            renderMenu();
+            renderAdminMenu();
+            e.target.reset();
+            showToast("Menu mis à jour !", 'success');
         }
 
+        /* ============================================================
+           GESTION DU MENU (modifier / supprimer un plat)
+           ============================================================ */
         function renderAdminMenu() {
             const container = document.getElementById('admin-menu-list');
             if (!container) return;
@@ -1378,6 +1516,7 @@
                     </div>
                 </div>`).join('');
         }
+
         function openEditDish(id) {
             const dish = findDishById(id);
             if (!dish) return;
@@ -1387,38 +1526,53 @@
             document.getElementById('edit-dish-price').value = dish.price;
             openModal('editDishModal');
         }
+
         function saveDishEdit(e) {
             e.preventDefault();
             const id = document.getElementById('edit-dish-id').value;
             const dish = findDishById(id);
             if (!dish) { showToast("Plat introuvable.", 'error'); return; }
+
             dish.name = document.getElementById('edit-dish-name').value.trim();
             dish.desc = document.getElementById('edit-dish-desc').value.trim();
             dish.price = document.getElementById('edit-dish-price').value.trim();
+
             if (!dish.name || !dish.desc || !dish.price) { showToast("Merci de remplir tous les champs.", 'error'); return; }
-            db.collection('menu').doc(id).set(dish).then(() => {
-                closeModal('editDishModal');
-                showToast("Plat modifié avec succès.", 'success');
-            });
+
+            persist(STORAGE_KEYS.menu, menuItems);
+            renderMenu();
+            renderAdminMenu();
+            closeModal('editDishModal');
+            showToast("Plat modifié avec succès.", 'success');
         }
+
         function deleteDish(id) {
             const dish = findDishById(id);
             if (!dish) return;
             if (!window.confirm(`Supprimer "${dish.name}" de la carte ?`)) return;
-            db.collection('menu').doc(id).delete();
+            menuItems = menuItems.filter(item => item.id !== id);
+            persist(STORAGE_KEYS.menu, menuItems);
+            renderMenu();
+            renderAdminMenu();
             showToast("Plat supprimé.", 'success');
         }
 
         let pointActionType = 'add';
-        function setPointAction(action) { pointActionType = action; }
+        function setPointAction(action) {
+            pointActionType = action;
+        }
+
         function manageCasinoPoints(e) {
             e.preventDefault();
             const n = document.getElementById('target-nom').value.trim();
             const p = document.getElementById('target-prenom').value.trim();
             const pts = parseInt(document.getElementById('target-points').value, 10);
+            
             if (!Number.isFinite(pts) || pts <= 0) { showToast("Montant invalide.", 'error'); return; }
+            
             const target = findUserByNomPrenom(n, p);
             if (!target) { showToast("Client introuvable.", 'error'); return; }
+
             if (pointActionType === 'remove') {
                 if ((target.points || 0) < pts) {
                     showToast(`Le client n'a que ${target.points || 0} jetons. Retrait impossible.`, 'error');
@@ -1430,28 +1584,34 @@
                 target.points = (target.points || 0) + pts;
                 showToast(`+${pts} jetons crédités à ${target.prenom} ${target.nom}.`, 'success');
             }
-            db.collection('users').doc(target.id).set(target).then(() => {
-                if (currentUser && currentUser.id === target.id) { 
-                    currentUser.points = target.points; 
-                    localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(currentUser)); 
-                    checkAuthUI(); 
-                }
-                e.target.reset();
-            });
+
+            persist(STORAGE_KEYS.users, users);
+            if (currentUser && currentUser.id === target.id) { 
+                currentUser.points = target.points; 
+                persist(STORAGE_KEYS.current, currentUser); 
+                checkAuthUI(); 
+            }
+            renderAdminUsers();
+            renderLeaderboard();
+            e.target.reset();
         }
 
         /* ============================================================
-           MISES EN DIRECT & HISTORIQUE (FIREBASE)
+           MISES EN DIRECT & HISTORIQUE
            ============================================================ */
         function recordLiveBet(game, amount, details = '') {
             if (!currentUser) return;
-            db.collection('liveBets').add({
+            liveBets.unshift({
                 nom: currentUser.nom,
                 prenom: currentUser.prenom,
                 game, amount, details,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
             });
+            if (liveBets.length > 20) liveBets.pop();
+            persist(STORAGE_KEYS.liveBets, liveBets);
+            renderLiveBets();
         }
+
         function renderLiveBets() {
             const container = document.getElementById('live-bets-list');
             if (!container) return;
@@ -1469,14 +1629,13 @@
                     </div>
                 </div>`).join('');
         }
+
         function recordCasinoGame(game, bet, win, diff) {
             if (!currentUser) return;
-            db.collection('history').add({ 
-                nom: currentUser.nom, 
-                prenom: currentUser.prenom, 
-                game, bet, win, diff, 
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-            });
+            casinoHistory.unshift({ nom: currentUser.nom, prenom: currentUser.prenom, game, bet, win, diff, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
+            if (casinoHistory.length > 30) casinoHistory.pop();
+            persist(STORAGE_KEYS.history, casinoHistory);
+            renderCasinoHistory();
         }
         function renderCasinoHistory() {
             const c = document.getElementById('casino-history-list');
@@ -1490,37 +1649,45 @@
         }
 
         /* ============================================================
-           POKER MULTIJOUEUR FIREBASE
+           POKER MULTIJOUEUR (2-8 joueurs, même appareil)
            ============================================================ */
         function createOrJoinPokerTable() {
             if (!currentUser) { showToast("Connectez-vous pour jouer.", 'error'); openModal('loginModal'); return; }
+
             if (pokerTable.players.some(p => p.nom === currentUser.nom && p.prenom === currentUser.prenom)) {
                 showToast("Vous êtes déjà assis à cette table !");
                 document.getElementById('poker-setup').style.display = 'none';
                 document.getElementById('poker-board').style.display = 'block';
                 return;
             }
-            if (pokerTable.players.length >= GAME_RULES.pokerMaxPlayers) { showToast("La table est complète.", 'error'); return; }
+
+            if (pokerTable.players.length >= GAME_RULES.pokerMaxPlayers) { showToast(`La table est complète (maximum ${GAME_RULES.pokerMaxPlayers} joueurs).`, 'error'); return; }
+
             const buyin = parseInt(document.getElementById('poker-buyin').value, 10) || 200;
             if (!currentUser.points || currentUser.points < buyin) { showToast("Solde insuffisant pour payer la mise d'entrée !", 'error'); return; }
-            
+
             currentUser.points -= buyin;
             updateUserStorage();
+
             pokerTable.players.push({ nom: currentUser.nom, prenom: currentUser.prenom, stack: buyin, folded: false });
-            
-            db.doc('rooms/pokerTable').set(pokerTable).then(() => {
-                document.getElementById('poker-setup').style.display = 'none';
-                document.getElementById('poker-board').style.display = 'block';
-                playSfx('card');
-                recordLiveBet('Poker Texas', buyin, "Achat de tapis (Buy-in)");
-            });
+            persist(STORAGE_KEYS.pokerTable, pokerTable);
+
+            document.getElementById('poker-setup').style.display = 'none';
+            document.getElementById('poker-board').style.display = 'block';
+            renderPokerTable();
+            playSfx('card');
+            recordLiveBet('Poker Texas', buyin, "Achat de tapis (Buy-in)");
         }
+
         function renderPokerTable() {
+            pokerTable = loadObject(STORAGE_KEYS.pokerTable, { players: [], pot: 0, status: 'attente' });
             const countElem = document.getElementById('poker-players-count');
             const potElem = document.getElementById('poker-pot');
             if (!countElem || !potElem) return;
+
             countElem.innerText = pokerTable.players.length;
             potElem.innerText = pokerTable.pot + " Jetons";
+
             const seatsContainer = document.getElementById('poker-seats-list');
             seatsContainer.innerHTML = pokerTable.players.map(p => `
                 <div style="background: rgba(255,255,255,0.05); border: 1px solid ${p.folded ? 'var(--danger)' : 'var(--glass-border)'}; padding: 8px 12px; border-radius: 6px; text-align:center; min-width: 100px;">
@@ -1528,11 +1695,13 @@
                     <div style="font-size:0.9rem; font-weight:bold; color:#fff;">${p.stack} pts</div>
                     ${p.folded ? '<span style="font-size:0.6rem; color:var(--danger);">Couché</span>' : ''}
                 </div>`).join('');
+
             const isPlayerSeated = currentUser && pokerTable.players.some(p => p.nom === currentUser.nom && p.prenom === currentUser.prenom);
             if (isPlayerSeated) {
                 document.getElementById('poker-setup').style.display = 'none';
                 document.getElementById('poker-board').style.display = 'block';
             }
+
             if (pokerTable.players.length >= GAME_RULES.pokerMinPlayers && pokerTable.status === 'attente') {
                 document.getElementById('poker-start-btn').style.display = 'block';
                 document.getElementById('poker-actions').style.display = 'none';
@@ -1547,19 +1716,29 @@
                 document.getElementById('poker-room-status').innerText = "Manche de Poker en cours ! Faites vos choix.";
             }
         }
+
         function startPokerHand() {
             pokerTable.status = 'en_cours';
             pokerTable.pot = pokerTable.players.length * GAME_RULES.pokerBlind;
             pokerTable.players.forEach(p => { p.stack -= GAME_RULES.pokerBlind; p.folded = false; });
-            db.doc('rooms/pokerTable').set(pokerTable);
+
+            persist(STORAGE_KEYS.pokerTable, pokerTable);
+            document.getElementById('poker-start-btn').style.display = 'none';
+            document.getElementById('poker-actions').style.display = 'flex';
+            document.getElementById('poker-room-status').innerText = "Manche de Poker en cours ! Faites vos choix.";
+
+            renderPokerTable();
             playSfx('card');
             recordLiveBet('Poker Texas', GAME_RULES.pokerBlind, 'Blinde initiale');
         }
+
         function pokerAction(actionType) {
             if (!currentUser) return;
             const player = pokerTable.players.find(p => p.nom === currentUser.nom && p.prenom === currentUser.prenom);
             if (!player) return;
+
             playSfx('card');
+
             if (actionType === 'suivre') {
                 showToast("Vous avez suivi l'action.");
             } else if (actionType === 'relancer') {
@@ -1572,6 +1751,7 @@
                 player.folded = true;
                 showToast("Vous vous êtes couché pour cette manche.");
             }
+
             const activePlayers = pokerTable.players.filter(p => !p.folded);
             if (activePlayers.length === 1) {
                 const winner = activePlayers[0];
@@ -1582,25 +1762,30 @@
                     updateUserStorage();
                 } else {
                     const target = findUserByNomPrenom(winner.nom, winner.prenom);
-                    if (target) { target.points += pokerTable.pot; db.collection('users').doc(target.id).set(target); }
+                    if (target) { target.points += pokerTable.pot; persist(STORAGE_KEYS.users, users); }
                 }
                 showToast(`🏆 ${winner.prenom} remporte la manche et gagne ${pokerTable.pot} jetons !`, 'success');
                 pokerTable.pot = 0;
                 pokerTable.status = 'attente';
+                document.getElementById('poker-actions').style.display = 'none';
             }
-            db.doc('rooms/pokerTable').set(pokerTable);
+
+            persist(STORAGE_KEYS.pokerTable, pokerTable);
+            renderPokerTable();
         }
 
         /* ============================================================
-           JEUX DE CASINO
+           BLACKJACK
            ============================================================ */
         let bjDeck = [], pHand = [], dHand = [], bjBet = 100, bjLocked = false;
+
         function readBet(inputId, min) {
             const raw = document.getElementById(inputId).value;
             const val = parseInt(raw, 10);
             if (!Number.isFinite(val) || val < min) return null;
             return val;
         }
+
         function startBlackjack() {
             if (bjLocked) return;
             const bet = readBet('bj-bet', GAME_RULES.minBetDefault);
@@ -1608,17 +1793,21 @@
             bjBet = bet;
             currentUser.points -= bjBet;
             updateUserStorage();
+
             playSfx('card');
             recordLiveBet('Blackjack', bjBet);
+
             const suits = ['♠', '♥', '♦', '♣'], values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
             bjDeck = [];
             suits.forEach(suit => values.forEach(val => bjDeck.push({ val, suit })));
             bjDeck.sort(() => Math.random() - 0.5);
             pHand = [bjDeck.pop(), bjDeck.pop()];
             dHand = [bjDeck.pop(), bjDeck.pop()];
+
             renderBj(false);
             document.getElementById('bj-start-btn').style.display = 'none';
             document.getElementById('bj-actions').style.display = 'flex';
+
             const playerHasBlackjack = calcHand(pHand) === 21;
             const dealerHasBlackjack = calcHand(dHand) === 21;
             if (playerHasBlackjack && dealerHasBlackjack) {
@@ -1627,6 +1816,7 @@
                 endBj("BLACKJACK ! Payé 3:2", 'win', Math.floor(bjBet * GAME_RULES.blackjackPayout));
             }
         }
+
         function calcHand(h) {
             let sum = 0, aces = 0;
             h.forEach(c => {
@@ -1637,6 +1827,7 @@
             while (sum > 21 && aces > 0) { sum -= 10; aces--; }
             return sum;
         }
+
         function renderBj(reveal) {
             document.getElementById('bj-player-cards').innerHTML = pHand.map(c => `<div class="playing-card ${['♥', '♦'].includes(c.suit) ? 'red' : ''}">${c.val}<br><span style="font-size:1.8rem; text-align:center;">${c.suit}</span></div>`).join('');
             const playerScore = calcHand(pHand);
@@ -1644,12 +1835,14 @@
             document.getElementById('bj-dealer-info').innerText = `Banque: ${dealerDisplay} | Vous: ${playerScore}`;
             if (playerScore > 21 && !bjLocked) { endBj("Vous avez sauté ! Perdu.", 'lose', 0); }
         }
+
         function hitBlackjack() {
             if (bjLocked) return;
             playSfx('card');
             pHand.push(bjDeck.pop());
             renderBj(false);
         }
+
         function standBlackjack() {
             if (bjLocked) return;
             playSfx('card');
@@ -1661,15 +1854,17 @@
             else if (playerScore === dealerScore) { endBj("Égalité", 'push', bjBet); }
             else { endBj("Banque gagne", 'lose', 0); }
         }
+
         function endBj(msg, outcome, rewardAmount) {
             bjLocked = true;
             document.getElementById('bj-status').innerText = msg;
+
             if (outcome === 'win') {
                 currentUser.points += rewardAmount;
                 playSfx('win');
                 recordCasinoGame('Blackjack', bjBet, true, rewardAmount - bjBet);
             } else if (outcome === 'push') {
-                currentUser.points += rewardAmount;
+                currentUser.points += rewardAmount; // rembourse la mise
                 recordCasinoGame('Blackjack', bjBet, true, 0);
             } else {
                 recordCasinoGame('Blackjack', bjBet, false, 0);
@@ -1680,6 +1875,9 @@
             bjLocked = false;
         }
 
+        /* ============================================================
+           MACHINE À SOUS
+           ============================================================ */
         let slotsLocked = false;
         function playSlots() {
             if (slotsLocked) return;
@@ -1689,9 +1887,11 @@
             document.getElementById('slot-play-btn').disabled = true;
             currentUser.points -= bet;
             updateUserStorage();
+
             playSfx('slot');
             recordLiveBet('Machines à Sous', bet);
             document.getElementById('slot-status').innerText = "...";
+
             setTimeout(() => {
                 const symbols = ['🍒', '🍋', '💎', '7️⃣', '🔔'];
                 const s1 = symbols[Math.floor(Math.random() * symbols.length)];
@@ -1700,6 +1900,7 @@
                 document.getElementById('slot-1').innerText = s1;
                 document.getElementById('slot-2').innerText = s2;
                 document.getElementById('slot-3').innerText = s3;
+
                 if (s1 === s2 && s2 === s3) {
                     const win = bet * GAME_RULES.slotJackpotMultiplier;
                     currentUser.points += win;
@@ -1722,6 +1923,9 @@
             }, 400);
         }
 
+        /* ============================================================
+           ROULETTE
+           ============================================================ */
         let rouletteLocked = false;
         function playRoulette(choice) {
             if (rouletteLocked) return;
@@ -1732,8 +1936,10 @@
             document.getElementById('roulette-noir-btn').disabled = true;
             currentUser.points -= bet;
             updateUserStorage();
+
             playSfx('roulette');
             recordLiveBet('Roulette', bet, `Choix: ${choice}`);
+
             setTimeout(() => {
                 const outcomes = ['Rouge', 'Noir', 'Rouge', 'Noir', 'Vert(0)'];
                 const result = outcomes[Math.floor(Math.random() * outcomes.length)];
@@ -1755,24 +1961,32 @@
             }, 500);
         }
 
+        /* ============================================================
+           JEU DU DÉ
+           ============================================================ */
         let diceLocked = false;
         function playDice() {
             if (diceLocked) return;
             const bet = readBet('dice-bet', GAME_RULES.minBetDice);
             if (bet === null || !currentUser || currentUser.points < bet) { showToast(`Solde insuffisant ou mise < ${GAME_RULES.minBetDice}.`, 'error'); return; }
             const choice = parseInt(document.getElementById('dice-choice').value, 10);
+
             diceLocked = true;
             document.getElementById('dice-play-btn').disabled = true;
             currentUser.points -= bet;
             updateUserStorage();
+
             playSfx('dice');
             recordLiveBet('Jeu du Dé', bet, `Numéro parié: ${choice}`);
+
             document.getElementById('dice-result').innerText = "🎲";
             document.getElementById('dice-status').innerText = "Le dé roule...";
+
             setTimeout(() => {
                 const result = Math.floor(Math.random() * 6) + 1;
                 const diceEmojis = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
                 document.getElementById('dice-result').innerText = diceEmojis[result];
+
                 if (result === choice) {
                     const winAmount = bet * GAME_RULES.diceMultiplier;
                     currentUser.points += winAmount;
@@ -1789,11 +2003,15 @@
             }, 500);
         }
 
+        /* ============================================================
+           SYNCHRONISATION UTILISATEUR
+           ============================================================ */
         function updateUserStorage() {
             if (!currentUser) return;
             document.getElementById('user-points').innerText = currentUser.points;
-            localStorage.setItem(STORAGE_KEYS.current, JSON.stringify(currentUser));
-            db.collection('users').doc(currentUser.id).set(currentUser);
+            persist(STORAGE_KEYS.current, currentUser);
+            const uIndex = users.findIndex(u => u && u.id === currentUser.id);
+            if (uIndex !== -1) { users[uIndex] = currentUser; persist(STORAGE_KEYS.users, users); }
             checkAuthUI();
             renderAdminUsers();
             renderLeaderboard();
