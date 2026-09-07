@@ -755,6 +755,7 @@
             rouletteMultiplier: 2,
             vipPriceTokens: 1500,
             vipPriceCash: '1000 €',
+            vipDurationMs: 7 * 24 * 60 * 60 * 1000, // 1 semaine
             pokerMinPlayers: 2,
             pokerMaxPlayers: 8,
             pokerRaiseAmount: 100,
@@ -872,6 +873,46 @@
             return users.find(u => u && u.nom && u.prenom && u.nom.toLowerCase() === n && u.prenom.toLowerCase() === p);
         }
         function findDishById(id) { return menuItems.find(item => item && item.id === id); }
+
+        /* ============================================================
+           VIP : octroi et expiration (durée 1 semaine)
+           ============================================================ */
+        function grantVip(user) {
+            user.isVip = true;
+            user.vipExpiresAt = Date.now() + GAME_RULES.vipDurationMs;
+        }
+
+        function revokeVip(user) {
+            user.isVip = false;
+            delete user.vipExpiresAt;
+        }
+
+        // Repasse automatiquement les VIP expirés en non-VIP. Retourne true si des données ont changé.
+        function checkVipExpiry() {
+            let changed = false;
+            users.forEach(u => {
+                if (u && u.isVip && u.vipExpiresAt && Date.now() > u.vipExpiresAt) {
+                    revokeVip(u);
+                    changed = true;
+                }
+            });
+            if (changed) persist(STORAGE_KEYS.users, users);
+
+            if (currentUser && currentUser.isVip && currentUser.vipExpiresAt && Date.now() > currentUser.vipExpiresAt) {
+                revokeVip(currentUser);
+                persist(STORAGE_KEYS.current, currentUser);
+                changed = true;
+            }
+            return changed;
+        }
+
+        function formatVipRemaining(user) {
+            if (!user.vipExpiresAt) return '';
+            const msLeft = user.vipExpiresAt - Date.now();
+            if (msLeft <= 0) return '';
+            const daysLeft = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
+            return daysLeft <= 1 ? 'moins d\'1 jour' : `${daysLeft} jours`;
+        }
 
         /* ============================================================
            SYSTÈME AUDIO (Web Audio API)
@@ -1009,6 +1050,7 @@
            ============================================================ */
         function initApp() {
             migrateLegacyData();
+            checkVipExpiry();
             renderMenu();
             checkAuthUI();
             renderAdminOrders();
@@ -1019,6 +1061,9 @@
             renderLiveBets();
             renderPokerTable();
             renderLeaderboard();
+            setInterval(() => {
+                if (checkVipExpiry()) { checkAuthUI(); renderAdminUsers(); renderLeaderboard(); }
+            }, 60000);
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     document.querySelectorAll('.modal').forEach(m => { if (m.style.display === 'flex') closeModal(m.id); });
@@ -1066,9 +1111,9 @@
             closeModal('vipModal');
             if (currentUser.employe || currentUser.points >= GAME_RULES.vipPriceTokens) {
                 if (!currentUser.employe) { currentUser.points -= GAME_RULES.vipPriceTokens; }
-                currentUser.isVip = true;
+                grantVip(currentUser);
                 updateUserStorage();
-                showToast("✨ Réservation VIP confirmée.", 'success');
+                showToast("✨ Réservation VIP confirmée pour 1 semaine.", 'success');
             } else {
                 showToast(`❌ Solde insuffisant (${GAME_RULES.vipPriceTokens} jetons requis).`, 'error');
             }
@@ -1340,13 +1385,14 @@
 
             const target = findUserByNomPrenom(req.nom, req.prenom);
             if (target) {
-                target.isVip = true;
+                grantVip(target);
                 persist(STORAGE_KEYS.users, users);
-                if (currentUser && currentUser.id === target.id) { currentUser.isVip = true; persist(STORAGE_KEYS.current, currentUser); checkAuthUI(); }
+                if (currentUser && currentUser.id === target.id) { grantVip(currentUser); persist(STORAGE_KEYS.current, currentUser); checkAuthUI(); }
             }
             renderAdminVipRequests();
             renderAdminUsers();
-            showToast("Paiement validé. Statut VIP accordé.", 'success');
+            renderLeaderboard();
+            showToast("Paiement validé. Statut VIP accordé pour 1 semaine.", 'success');
         }
 
         function renderAdminUsers() {
@@ -1357,13 +1403,13 @@
                 <div class="admin-row" style="border-left-color: ${u.employe ? 'var(--success)' : 'var(--text-muted)'}">
                     <div>
                         <strong style="font-size: 1rem; color: #fff;">${escapeHtml(u.prenom)} ${escapeHtml(u.nom)}</strong>
-                        <div style="margin-top: 3px;">${u.employe ? '<span class="badge badge-employe">Staff</span>' : ''} ${u.isVip ? '<span class="badge badge-vip">VIP</span>' : ''}</div>
+                        <div style="margin-top: 3px;">${u.employe ? '<span class="badge badge-employe">Staff</span>' : ''} ${u.isVip ? `<span class="badge badge-vip">VIP${formatVipRemaining(u) ? ' · ' + formatVipRemaining(u) : ''}</span>` : ''}</div>
                     </div>
                     <div style="text-align: right;">
                         <span style="font-family: var(--font-heading), serif; color: var(--gold-light); font-size: 1.1rem;">${u.points || 0} pts</span>
                         <div style="display:flex; gap:5px; margin-top:4px;">
                             <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 6px; cursor:pointer;" onclick="toggleRole('${u.id}', 'employe')">${u.employe ? '- Staff' : '+ Staff'}</button>
-                            <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 6px; cursor:pointer;" onclick="toggleRole('${u.id}', 'isVip')">${u.isVip ? '- VIP' : '+ VIP'}</button>
+                            <button type="button" class="btn-outline" style="font-size:0.65rem; padding:3px 6px; cursor:pointer;" onclick="toggleRole('${u.id}', 'isVip')">${u.isVip ? '- VIP' : '+ VIP (1 semaine)'}</button>
                             <button type="button" class="btn-danger" style="font-size:0.65rem; padding:3px 6px; border-radius:4px; border:none; cursor:pointer;" onclick="deleteUser('${u.id}')">Supprimer</button>
                         </div>
                     </div>
@@ -1391,11 +1437,13 @@
             const medals = ['🥇', '🥈', '🥉'];
             container.innerHTML = ranked.map((u, i) => {
                 const isMe = currentUser && currentUser.id === u.id;
+                const remaining = formatVipRemaining(u);
                 return `
                 <div class="admin-row" style="border-left-color: ${i === 0 ? 'var(--gold-primary)' : 'var(--glass-border)'}; ${isMe ? 'outline: 1px solid var(--gold-primary);' : ''}">
                     <div>
                         <strong style="color:#fff;">${medals[i] || `#${i + 1}`} ${escapeHtml(u.prenom)} ${escapeHtml(u.nom)}</strong>
                         ${isMe ? '<span style="color:var(--gold-light); font-size:0.7rem;"> (Vous)</span>' : ''}
+                        <div style="margin-top:2px;">${u.isVip ? `<span class="badge badge-vip">VIP${remaining ? ' · ' + remaining : ''}</span>` : '<span style="font-size:0.7rem; color:var(--text-muted);">Non-VIP</span>'}</div>
                     </div>
                     <span style="font-family: var(--font-heading), serif; color: var(--gold-light); font-size: 1.05rem;">${u.points || 0} jetons</span>
                 </div>`;
@@ -1405,10 +1453,23 @@
         function toggleRole(id, roleProp) {
             const target = findUserById(id);
             if (!target) return;
-            target[roleProp] = !target[roleProp];
+
+            if (roleProp === 'isVip') {
+                if (target.isVip) { revokeVip(target); } else { grantVip(target); }
+            } else {
+                target[roleProp] = !target[roleProp];
+            }
+
             persist(STORAGE_KEYS.users, users);
-            if (currentUser && currentUser.id === target.id) { currentUser[roleProp] = target[roleProp]; persist(STORAGE_KEYS.current, currentUser); checkAuthUI(); }
+            if (currentUser && currentUser.id === target.id) {
+                currentUser.isVip = target.isVip;
+                currentUser.vipExpiresAt = target.vipExpiresAt;
+                currentUser[roleProp] = target[roleProp];
+                persist(STORAGE_KEYS.current, currentUser);
+                checkAuthUI();
+            }
             renderAdminUsers();
+            renderLeaderboard();
         }
 
         function deleteUser(id) {
